@@ -1,4 +1,3 @@
-import { FC } from "react";
 import SideBarItem from "./SideBarItem";
 import home from "/home.svg";
 import archive from "/archive.svg";
@@ -10,7 +9,7 @@ type SideBarProps = {
   isOpen: boolean;
 }
 
-const SideBar: FC<SideBarProps> = ({ isOpen }) => {
+const SideBar = ({ isOpen }: SideBarProps) => {
   return (
     <nav className={`h-full p-6 w-72 border shadow-md z-20 bg-white fixed ${isOpen ? "md:static translate-x-0" : "-translate-x-full"}`}>
       <SideBarItem title="Dashboard" icon={home} url={"/"} />

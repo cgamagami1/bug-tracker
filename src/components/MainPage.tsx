@@ -1,10 +1,10 @@
-import { FC, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import SideBar from "./SideBar";
 import HeaderBar from "./HeaderBar";
 import useMediaQuery from "../utils/useMediaQuery";
 
-const MainPage: FC = () => {
+const MainPage = () => {
   const isDesktop = useMediaQuery('(min-width: 768px)');
   const [isSideBarOpen, setIsSideBarOpen] = useState(true);
 

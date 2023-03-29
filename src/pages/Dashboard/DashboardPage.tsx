@@ -1,9 +1,8 @@
-import { FC } from "react";
 
-const DashboardPage: FC = () => {
+const DashboardPage = () => {
   return (
-    <div className="overflow-y-scroll bg-gray-100 flex-grow p-8">
-      DashboardPage
+    <div className="bg-gray-100 flex-grow p-8">
+      <h2 className="text-xl text-gray-700">Dashboard</h2>
     </div>
   );
 }

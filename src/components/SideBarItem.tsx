@@ -1,4 +1,3 @@
-import { FC } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 type SideBarItemProps = {
@@ -7,7 +6,7 @@ type SideBarItemProps = {
   url: string;
 }
 
-const SideBarItem: FC<SideBarItemProps> = ({ title, icon, url}) => {
+const SideBarItem = ({ title, icon, url}: SideBarItemProps) => {
   const { pathname } = useLocation();
 
   return (

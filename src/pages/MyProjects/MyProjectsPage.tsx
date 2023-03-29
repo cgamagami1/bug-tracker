@@ -1,9 +1,11 @@
-import { FC } from "react";
+import ProjectsTable from "./ProjectsTable";
 
-const MyProjectsPage: FC = () => {
+const MyProjectsPage = () => {
   return (
-    <div className="overflow-y-scroll bg-gray-100 flex-grow">
-      MyProjectsPage
+    <div className="bg-gray-100 flex-grow p-4 md:p-8 text-gray-700">
+      <h2 className="text-xl mb-6">My Projects</h2>
+
+      <ProjectsTable />
     </div>
   );
 }

@@ -1,11 +1,7 @@
 import { ReactNode, Dispatch, SetStateAction, useState } from "react";
 import left from "../assets/left.svg";
 import right from "../assets/right.svg";
-
-type ShownEntries = {
-  firstShownEntry: number;
-  lastShownEntry: number;
-}
+import { ShownEntries } from "../utils/useTable";
 
 type TableProps = {
   title: string;

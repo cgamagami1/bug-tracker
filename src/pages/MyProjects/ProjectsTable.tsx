@@ -2,17 +2,13 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import Table from "../../components/Table";
 import TableHeader from "../../components/TableHeader";
+import useTable from "../../utils/useTable";
 
 export type Project = {
   id: number;
   name: string;
   description: string;
 }
-
-const sortByName = (a: Project, b: Project) => a.name.localeCompare(b.name); 
-const sortByNameReversed = (a: Project, b: Project) => b.name.localeCompare(a.name);
-const sortByDescription = (a: Project, b: Project) => a.description.localeCompare(b.description); 
-const sortByDescriptionReversed = (a: Project, b: Project) => b.description.localeCompare(a.description);
 
 const ProjectsTable = () => {
   const projects = [
@@ -157,32 +153,21 @@ const ProjectsTable = () => {
         description: "adescription"
       },
   ]
-  const [sortingAlgorithm, setSortingAlgorithm] = useState(() => (a: Project, b: Project) => 0);
-  const [shownEntries, setShownEntries] = useState({ firstShownEntry: 0, lastShownEntry: Math.min(4 , projects.length - 1) });
 
-  projects.sort(sortingAlgorithm);
+  const { sortedEntries, sortAlgorithm, setSortAlgorithm, shownEntries, setShownEntries } = useTable(projects);
 
   return (
     <Table title="Projects" shownEntries={shownEntries} setShownEntries={setShownEntries} totalEntries={projects.length}> 
       <thead>
         <tr>
-          <TableHeader title="Name" className="max-w-64" 
-            sortingAlgorithm={sortingAlgorithm} 
-            setSortingAlgorithm={setSortingAlgorithm} 
-            headerSortingAlgorithm={sortByName} 
-            headerReverseSortingAlgorithm={sortByNameReversed} />
-          <TableHeader title="Description" className="hidden md:table-cell"
-            sortingAlgorithm={sortingAlgorithm}
-            setSortingAlgorithm={setSortingAlgorithm}
-            headerSortingAlgorithm={sortByDescription}
-            headerReverseSortingAlgorithm={sortByDescriptionReversed} />
+          <TableHeader title="Name" className="w-64" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute="name" /> 
+          <TableHeader title="Description" className="hidden md:table-cell" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute="description" />
         </tr>
       </thead>
 
       <tbody>
         {
-          projects.map((project, i) => (
-            (i >= shownEntries.firstShownEntry && i <= shownEntries.lastShownEntry) && 
+          sortedEntries.map(project => (
             <tr key={project.id} className="border-t border-gray-200">
               <td className="p-4">{ project.name }</td>
               <td className="p-4 hidden md:table-cell">{ project.description }</td>

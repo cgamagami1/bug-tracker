@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, MouseEvent } from "react";
 import up from "../assets/up.svg";
 import down from "../assets/down.svg";
-import { SortAlgorithm } from "../pages/MyProjects/ProjectsTable";
+import { SortAlgorithm } from "../utils/useTable";
 
 type TableHeaderProps<T> = {
   title: string;

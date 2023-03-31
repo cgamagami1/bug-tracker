@@ -33,8 +33,8 @@ const TableHeader = <T,>({ title, className, sortAlgorithm, setSortAlgorithm, he
     <th className={`p-4 relative hover:cursor-pointer select-none ${className}`} onClick={handleOnClick}>
       <span className="mr-6">{ title }</span>
       <span className="inline-flex flex-col absolute right-4">
-        <img className={`w-3 ${isNormalSorted ? "scale-150" : ""}`} src={up} alt="up icon" />
-        <img className={`w-3 ${isReverseSorted ? "scale-150" : ""}`} src={down} alt="down icon" />
+        <img className={`w-3 scale-125 ${isNormalSorted ? "opacity-100" : "opacity-50 "}`} src={up} alt="up icon" />
+        <img className={`w-3 scale-125 ${isReverseSorted ? "opacity-100" : "opacity-50 "}`} src={down} alt="down icon" />
       </span>
     </th>
   );

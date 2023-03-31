@@ -11,7 +11,7 @@ type SideBarProps = {
 
 const SideBar = ({ isOpen }: SideBarProps) => {
   return (
-    <nav className={`h-full p-6 w-72 border shadow-md z-20 bg-white fixed ${isOpen ? "md:static translate-x-0" : "-translate-x-full"}`}>
+    <nav className={`h-full p-6 w-72 border shadow-md z-20 bg-white fixed ${isOpen ? "2xl:static translate-x-0" : "-translate-x-full"}`}>
       <SideBarItem title="Dashboard" icon={home} url={"/"} />
       <SideBarItem title="My Projects" icon={archive} url={"/projects"} />
       <SideBarItem title="My Tickets" icon={tag} url={"/tickets"} />

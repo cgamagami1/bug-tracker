@@ -45,7 +45,7 @@ const Table = ({ title, shownEntries, setShownEntries, totalEntries, children }:
   }
 
   return (
-    <div className="bg-white rounded-md px-4 md:px-6 py-2">
+    <div className="bg-white rounded-md px-4 md:px-6 py-2 flex-grow text-sm">
       <h3 className="text-xl p-4">{ title }</h3>
 
       <table className="text-left border-t border-b border-gray-400 w-full">

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import Table from "../../components/Table";
 import TableHeader from "../../components/TableHeader";
@@ -82,76 +81,6 @@ const ProjectsTable = () => {
         name: "proj",
         description: "adescription"
       },
-      {
-        id: 14,
-        name: "proj",
-        description: "description"
-      },
-      {
-        id: 15,
-        name: "aproj",
-        description: "ddescription"
-      },
-      {
-        id: 16,
-        name: "bproj",
-        description: "edescription"
-      },
-      {
-        id: 17,
-        name: "proj",
-        description: "bdescription"
-      },
-      {
-        id: 18,
-        name: "dproj",
-        description: "description"
-      },
-      {
-        id: 19,
-        name: "cproj",
-        description: "description"
-      },
-      {
-        id: 20,
-        name: "proj",
-        description: "adescription"
-      },
-      {
-        id: 21,
-        name: "proj",
-        description: "description"
-      },
-      {
-        id: 22,
-        name: "aproj",
-        description: "ddescription"
-      },
-      {
-        id: 23,
-        name: "bproj",
-        description: "edescription"
-      },
-      {
-        id: 24,
-        name: "proj",
-        description: "bdescription"
-      },
-      {
-        id: 25,
-        name: "dproj",
-        description: "description"
-      },
-      {
-        id: 26,
-        name: "cproj",
-        description: "description"
-      },
-      {
-        id: 27,
-        name: "proj",
-        description: "adescription"
-      },
   ]
 
   const { sortedEntries, sortAlgorithm, setSortAlgorithm, shownEntries, setShownEntries } = useTable(projects);
@@ -171,8 +100,8 @@ const ProjectsTable = () => {
             <tr key={project.id} className="border-t border-gray-200">
               <td className="p-4">{ project.name }</td>
               <td className="p-4 hidden md:table-cell">{ project.description }</td>
-              <td className="p-4 text-purple-700 w-20">
-                <Link to={`/projects/${project.name.toLowerCase()}`}>Details</Link>
+              <td className="p-4">
+                <Link className="hover:underline text-purple-700" to={`/projects/${project.name.toLowerCase()}`}>Details</Link>
               </td>
             </tr>
           ))

@@ -5,7 +5,7 @@ import HeaderBar from "./HeaderBar";
 import useMediaQuery from "../utils/useMediaQuery";
 
 const MainPage = () => {
-  const isDesktop = useMediaQuery('(min-width: 768px)');
+  const isDesktop = useMediaQuery('(min-width: 1536px)');
   const [isSideBarOpen, setIsSideBarOpen] = useState(true);
 
   useEffect(() => {

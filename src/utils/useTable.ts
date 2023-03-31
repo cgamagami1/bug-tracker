@@ -1,3 +1,4 @@
+import { DateTime } from "luxon";
 import { useState } from "react";
 
 export type SortAlgorithm<T> = {
@@ -17,12 +18,15 @@ const newSortAlgorithm = <T>(sortAlgorithm: SortAlgorithm<T>) => {
 
     const val1 = isReversed ? b[attribute] : a[attribute];
     const val2 = isReversed ? a[attribute] : b[attribute];
-    
+
     if (typeof val1 === "string" && typeof val2 === "string") {
       return val1.localeCompare(val2);
     }
     else if (typeof val1 === "number" && typeof val2 === "number") {
       return val1 - val2;
+    }
+    else if (val1 instanceof DateTime && val2 instanceof DateTime) {
+      return Number(val1) - Number(val2);
     }
 
     return 0;

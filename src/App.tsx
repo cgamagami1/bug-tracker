@@ -4,6 +4,7 @@ import DashboardPage from "./pages/Dashboard/DashboardPage";
 import MyProjectsPage from "./pages/MyProjects/MyProjectsPage";
 import MyTicketsPage from "./pages/MyTickets/MyTicketsPage";
 import ProjectPage from "./pages/Project/ProjectPage";
+import TicketPage from "./pages/Ticket/TicketPage";
 
 const App = () => {
 
@@ -14,6 +15,7 @@ const App = () => {
         <Route path="projects" element={<MyProjectsPage />} />
         <Route path="projects/:projectName" element={<ProjectPage />} />
         <Route path="tickets" element={<MyTicketsPage />} />
+        <Route path="tickets/:ticketId" element={<TicketPage />} />
         <Route path="manage" element={<div>Manage Users</div>} />
         <Route path="settings" element={<div>Settings</div>} />
       </Route>

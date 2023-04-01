@@ -15,72 +15,72 @@ const ProjectsTable = () => {
   const projects = [
       {
         id: 0,
-        name: "proj",
+        name: "My proj",
         description: "description"
       },
       {
         id: 1,
-        name: "aproj",
+        name: "My aproj",
         description: "ddescription"
       },
       {
         id: 2,
-        name: "bproj",
+        name: "My bproj",
         description: "edescription"
       },
       {
         id: 3,
-        name: "proj",
+        name: "My proj",
         description: "bdescription"
       },
       {
         id: 4,
-        name: "dproj",
+        name: "My dproj",
         description: "description"
       },
       {
         id: 5,
-        name: "cproj",
+        name: "My cproj",
         description: "description"
       },
       {
         id: 6,
-        name: "proj",
+        name: "My proj",
         description: "adescription"
       },
       {
         id: 7,
-        name: "proj",
+        name: "My proj",
         description: "description"
       },
       {
         id: 8,
-        name: "aproj",
+        name: "My aproj",
         description: "ddescription"
       },
       {
         id: 9,
-        name: "bproj",
+        name: "My bproj",
         description: "edescription"
       },
       {
         id: 10,
-        name: "proj",
+        name: "My proj",
         description: "bdescription"
       },
       {
         id: 11,
-        name: "dproj",
+        name: "My dproj",
         description: "description"
       },
       {
         id: 12,
-        name: "cproj",
+        name: "My cproj",
         description: "description"
       },
       {
         id: 13,
-        name: "proj",
+        name: "My proj",
         description: "adescription"
       },
   ]

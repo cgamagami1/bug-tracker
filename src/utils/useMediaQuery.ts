@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
 
 const useMediaQuery = (query: string, callback: (matches: boolean) => void) => {
-  const [matches, setMatches] = useState(window.matchMedia(query).matches);
+  const [matches, setMatches] = useState(false);
 
   useEffect(() => {
     const handleOnResize = () => {
-      const media = window.matchMedia(query);
-      setMatches(media.matches);
-      callback(media.matches);
+      setMatches(window.matchMedia(query).matches);
+      callback(window.matchMedia(query).matches);
     };
 
+    handleOnResize();
+    
     window.addEventListener("resize", handleOnResize);
     return () => window.removeEventListener("resize", handleOnResize);
   }, [query]);

@@ -38,11 +38,11 @@ const useTable = <T extends {}>(entries: T[], entriesPerPage = 5) => {
   const [sortAlgorithm, setSortAlgorithm] = useState<SortAlgorithm<T>>({ attribute: null, isReversed: false });
   const [firstShownEntry, setFirstShownEntry] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
-  const lastPage = Math.ceil(entries.length / entriesPerPage);
+  const lastPage = Math.floor(entries.length / entriesPerPage);
   const [pageButtons, setPageButtons] = useState<PageButtons>({
     firstPageButton: 0,
     secondPageButton: (entries.length / entriesPerPage) > 1 ? 1 : null,
-    thirdPageButton: (entries.length / (entriesPerPage * 2) > 1 ? 1 : null)
+    thirdPageButton: (entries.length / (entriesPerPage * 2) > 1 ? 2 : null)
   });
   const showingEntriesText = `Showing ${firstShownEntry + 1} to ${Math.min(firstShownEntry + entriesPerPage, entries.length)} of ${entries.length} entries`;
 
@@ -54,16 +54,16 @@ const useTable = <T extends {}>(entries: T[], entriesPerPage = 5) => {
     if (pageButtons.secondPageButton && pageButtons.thirdPageButton) {
       if (pageButtons.thirdPageButton < newPage) {
         setPageButtons({
-          firstPageButton: pageButtons.firstPageButton++,
-          secondPageButton: pageButtons.secondPageButton++,
-          thirdPageButton: pageButtons.thirdPageButton++
+          firstPageButton: pageButtons.firstPageButton + 1,
+          secondPageButton: pageButtons.secondPageButton + 1,
+          thirdPageButton: pageButtons.thirdPageButton + 1
         });
       }
       else if (newPage < pageButtons.firstPageButton) {
         setPageButtons({
-          firstPageButton: pageButtons.firstPageButton--,
-          secondPageButton: pageButtons.secondPageButton--,
-          thirdPageButton: pageButtons.thirdPageButton--
+          firstPageButton: pageButtons.firstPageButton - 1,
+          secondPageButton: pageButtons.secondPageButton - 1,
+          thirdPageButton: pageButtons.thirdPageButton - 1
         });
       }
     }
@@ -72,7 +72,7 @@ const useTable = <T extends {}>(entries: T[], entriesPerPage = 5) => {
   }
 
   const sortedEntries = [...entries].sort(newSortAlgorithm(sortAlgorithm))
-    .filter((_, i) => (firstShownEntry <= i && i <= firstShownEntry + entriesPerPage));
+    .filter((_, i) => (firstShownEntry <= i && i < firstShownEntry + entriesPerPage));
 
   return { sortedEntries, sortAlgorithm, setSortAlgorithm, showingEntriesText, currentPage, pageButtons, handleOnNewPage };
 }

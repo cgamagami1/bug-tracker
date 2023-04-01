@@ -36,16 +36,16 @@ const Table = ({ title, showingEntriesText, currentPage, pageButtons, handleOnNe
           <img className="border w-6 py-1 text-center rounded-md hover:cursor-pointer" src={left} alt="left arrow" onClick={handleOnPreviousPage} />
 
           <span className={`border w-6 py-1 text-center rounded-md hover:cursor-pointer ${currentPage === pageButtons.firstPageButton ? "bg-purple-500 text-white" : ""}`} 
-            onClick={() => handleOnNewPage(pageButtons.firstPageButton)}>{ pageButtons.firstPageButton }</span>
-          {
-            pageButtons.firstPageButton !== null &&
-            <span className={`border w-6 py-1 text-center rounded-md hover:cursor-pointer ${currentPage === pageButtons.secondPageButton ? "bg-purple-500 text-white" : ""}`} 
-              onClick={() => handleOnNewPage(pageButtons.secondPageButton!)}>{ pageButtons.secondPageButton }</span>
-          }
+            onClick={() => handleOnNewPage(pageButtons.firstPageButton)}>{ pageButtons.firstPageButton + 1 }</span>
           {
             pageButtons.secondPageButton !== null &&
+            <span className={`border w-6 py-1 text-center rounded-md hover:cursor-pointer ${currentPage === pageButtons.secondPageButton ? "bg-purple-500 text-white" : ""}`} 
+              onClick={() => handleOnNewPage(pageButtons.secondPageButton!)}>{ pageButtons.secondPageButton! + 1 }</span>
+          }
+          {
+            pageButtons.thirdPageButton !== null &&
             <span className={`border w-6 py-1 text-center rounded-md hover:cursor-pointer ${currentPage === pageButtons.thirdPageButton ? "bg-purple-500 text-white" : ""}`} 
-              onClick={() => handleOnNewPage(pageButtons.thirdPageButton!)}>{ pageButtons.thirdPageButton }</span>
+              onClick={() => handleOnNewPage(pageButtons.thirdPageButton!)}>{ pageButtons.thirdPageButton! + 1 }</span>
           }
           <img className="border w-6 py-1 text-center rounded-md hover:cursor-pointer" src={right} alt="right arrow" onClick={handleOnNextPage} />
         </div>

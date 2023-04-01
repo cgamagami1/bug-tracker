@@ -5,18 +5,20 @@ import HeaderBar from "./HeaderBar";
 import useMediaQuery from "../utils/useMediaQuery";
 
 const MainPage = () => {
-  const isDesktop = useMediaQuery('(min-width: 1536px)');
   const [isSideBarOpen, setIsSideBarOpen] = useState(true);
+  const isDesktop = useMediaQuery('(min-width: 1536px)', (isDesktop) => setIsSideBarOpen(isDesktop));
 
-  useEffect(() => {
-    setIsSideBarOpen(isDesktop);
-  }, [isDesktop]);
+  const handleOnSideBarClick = () => {
+    if (!isDesktop) {
+      setIsSideBarOpen(false);
+    }
+  }
 
   return (
     <div className="h-screen flex flex-col">
       <HeaderBar handleOnMenuClick={() => setIsSideBarOpen(isbo => !isbo)} />
       <div className="flex flex-grow">
-        <SideBar isOpen={isSideBarOpen} />
+        <SideBar isOpen={isSideBarOpen} handleOnClick={handleOnSideBarClick} />
         <Outlet />
       </div>
     </div>

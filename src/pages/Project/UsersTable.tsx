@@ -1,7 +1,8 @@
-import { SetStateAction } from "react";
 import Table from "../../components/Table";
 import TableHeader from "../../components/TableHeader";
-import useTable, { ShownEntries } from "../../utils/useTable";
+import useTable from "../../utils/useTable";
+import TableRow from "../../components/TableRow";
+import TableData from "../../components/TableData";
 
 export enum ROLE {
   ADMIN = "Admin",
@@ -43,12 +44,38 @@ const UsersTable = () => {
       email: "john@email.com",
       role: ROLE.DEVELOPER,
     },
+    {
+      id: 4,
+      name: "john",
+      email: "john@email.com",
+      role: ROLE.DEVELOPER,
+    },
+    {
+      id: 5,
+      name: "john",
+      email: "john@email.com",
+      role: ROLE.DEVELOPER,
+    },
+    {
+      id: 6,
+      name: "john",
+      email: "john@email.com",
+      role: ROLE.DEVELOPER,
+    },
   ]
 
-  const { sortedEntries, sortAlgorithm, setSortAlgorithm, shownEntries, setShownEntries } = useTable(users);
+  const { 
+    sortedEntries, 
+    sortAlgorithm, 
+    setSortAlgorithm,
+    showingEntriesText,
+    currentPage,
+    pageButtons,
+    handleOnNewPage 
+  } = useTable(users);
 
   return (
-    <Table title="Users" shownEntries={shownEntries} setShownEntries={setShownEntries} totalEntries={users.length}>
+    <Table title="Users" showingEntriesText={showingEntriesText} currentPage={currentPage} pageButtons={pageButtons} handleOnNewPage={handleOnNewPage}>
       <thead>
         <tr>
           <TableHeader title="Name" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute="name" />
@@ -60,11 +87,11 @@ const UsersTable = () => {
       <tbody>
         {
           sortedEntries.map(user => (
-            <tr key={user.id} className="border-t border-gray-200">
-              <td className="p-2 md:p-4">{ user.name }</td>
-              <td className="p-2 md:p-4">{ user.email }</td>
-              <td className="p-2 md:p-4">{ user.role }</td>
-            </tr>
+            <TableRow key={user.id}>
+              <TableData>{ user.name }</TableData>
+              <TableData>{ user.email }</TableData>
+              <TableData>{ user.role }</TableData>
+            </TableRow>
           ))
         }
       </tbody>

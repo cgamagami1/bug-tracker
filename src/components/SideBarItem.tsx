@@ -4,11 +4,12 @@ type SideBarItemProps = {
   title: string;
   icon: string;
   url: string;
+  handleOnClick: () => void;
 }
 
-const SideBarItem = ({ title, icon, url}: SideBarItemProps) => {
+const SideBarItem = ({ title, icon, url, handleOnClick}: SideBarItemProps) => {
   return (
-    <Link to={url} className="flex items-center p-4 relative hover:cursor-pointer">
+    <Link to={url} className="flex items-center p-4 relative hover:cursor-pointer" onClick={handleOnClick}>
       <Routes>
         <Route path={`${url}/*`} element={<span className="h-8 w-1 bg-black absolute left-0"></span>} />
       </Routes>

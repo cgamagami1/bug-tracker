@@ -7,16 +7,17 @@ import settings from "/settings.svg";
 
 type SideBarProps = {
   isOpen: boolean;
+  handleOnClick: () => void;
 }
 
-const SideBar = ({ isOpen }: SideBarProps) => {
+const SideBar = ({ isOpen, handleOnClick }: SideBarProps) => {
   return (
     <nav className={`h-full p-6 w-72 border shadow-md z-20 bg-white fixed ${isOpen ? "2xl:static translate-x-0" : "-translate-x-full"}`}>
-      <SideBarItem title="Dashboard" icon={home} url={"/"} />
-      <SideBarItem title="My Projects" icon={archive} url={"/projects"} />
-      <SideBarItem title="My Tickets" icon={tag} url={"/tickets"} />
-      <SideBarItem title="Manage Users" icon={users} url={"/manage"} />
-      <SideBarItem title="Settings" icon={settings} url={"/settings"} />
+      <SideBarItem title="Dashboard" icon={home} url={"/"} handleOnClick={handleOnClick} />
+      <SideBarItem title="My Projects" icon={archive} url={"/projects"} handleOnClick={handleOnClick} />
+      <SideBarItem title="My Tickets" icon={tag} url={"/tickets"} handleOnClick={handleOnClick} />
+      <SideBarItem title="Manage Users" icon={users} url={"/manage"} handleOnClick={handleOnClick} />
+      <SideBarItem title="Settings" icon={settings} url={"/settings"} handleOnClick={handleOnClick} />
     </nav>
   );
 }

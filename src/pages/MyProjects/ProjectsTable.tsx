@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import Table from "../../components/Table";
 import TableHeader from "../../components/TableHeader";
 import useTable from "../../utils/useTable";
+import TableData from "../../components/TableData";
+import TableRow from "../../components/TableRow";
 
 export type Project = {
   id: number;
@@ -83,27 +85,35 @@ const ProjectsTable = () => {
       },
   ]
 
-  const { sortedEntries, sortAlgorithm, setSortAlgorithm, shownEntries, setShownEntries } = useTable(projects);
+  const { 
+    sortedEntries, 
+    sortAlgorithm, 
+    setSortAlgorithm,
+    showingEntriesText, 
+    currentPage,
+    pageButtons,
+    handleOnNewPage
+  } = useTable(projects);
 
   return (
-    <Table title="Projects" shownEntries={shownEntries} setShownEntries={setShownEntries} totalEntries={projects.length}> 
+    <Table title="Projects" showingEntriesText={showingEntriesText} currentPage={currentPage} pageButtons={pageButtons} handleOnNewPage={handleOnNewPage}> 
       <thead>
         <tr>
-          <TableHeader title="Name" className="w-64" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute="name" /> 
-          <TableHeader title="Description" className="hidden md:table-cell" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute="description" />
+          <TableHeader title="Name" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute="name" /> 
+          <TableHeader title="Description" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute="description" />
         </tr>
       </thead>
 
       <tbody>
         {
           sortedEntries.map(project => (
-            <tr key={project.id} className="border-t border-gray-200">
-              <td className="p-4">{ project.name }</td>
-              <td className="p-4 hidden md:table-cell">{ project.description }</td>
-              <td className="p-4">
+            <TableRow key={project.id}>
+              <TableData>{ project.name }</TableData>
+              <TableData>{ project.description }</TableData>
+              <TableData>
                 <Link className="hover:underline text-purple-700" to={`/projects/${project.name.toLowerCase()}`}>Details</Link>
-              </td>
-            </tr>
+              </TableData>
+            </TableRow>
           ))
         }
       </tbody>

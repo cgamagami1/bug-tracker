@@ -1,4 +1,4 @@
-import Table from "../../components/Table";
+import TableContainer from "../../components/TableContainer";
 import TableHeader from "../../components/TableHeader";
 import useTable from "../../utils/useTable";
 import TableRow from "../../components/TableRow";
@@ -68,34 +68,36 @@ const UsersTable = () => {
     sortedEntries, 
     sortAlgorithm, 
     setSortAlgorithm,
-    showingEntriesText,
     currentPage,
-    pageButtons,
-    handleOnNewPage 
+    handleOnNewPage,
+    firstShownPageButton,
+    footerInfo
   } = useTable(users);
 
   return (
-    <Table title="Users" showingEntriesText={showingEntriesText} currentPage={currentPage} pageButtons={pageButtons} handleOnNewPage={handleOnNewPage}>
-      <thead>
-        <tr>
-          <TableHeader title="Name" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute="name" />
-          <TableHeader title="Email" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute="email" />
-          <TableHeader title="Role" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute="role" />
-        </tr>
-      </thead>
+    <TableContainer title="Users" currentPage={currentPage} handleOnNewPage={handleOnNewPage} firstShownPageButton={firstShownPageButton} footerInfo={footerInfo}>
+      <table>
+        <thead>
+          <tr>
+            <TableHeader title="Name" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute="name" />
+            <TableHeader title="Email" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute="email" />
+            <TableHeader title="Role" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute="role" />
+          </tr>
+        </thead>
 
-      <tbody>
-        {
-          sortedEntries.map(user => (
-            <TableRow key={user.id}>
-              <TableData>{ user.name }</TableData>
-              <TableData>{ user.email }</TableData>
-              <TableData>{ user.role }</TableData>
-            </TableRow>
-          ))
-        }
-      </tbody>
-    </Table>
+        <tbody>
+          {
+            sortedEntries.map(user => (
+              <TableRow key={user.id}>
+                <TableData>{ user.name }</TableData>
+                <TableData>{ user.email }</TableData>
+                <TableData>{ user.role }</TableData>
+              </TableRow>
+            ))
+          }
+        </tbody>
+      </table>
+    </TableContainer>
   );
 }
 

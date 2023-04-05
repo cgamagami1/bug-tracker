@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import Table from "../../components/Table";
+import TableContainer from "../../components/TableContainer";
 import TableHeader from "../../components/TableHeader";
 import useTable from "../../utils/useTable";
 import TableData from "../../components/TableData";
@@ -89,35 +89,37 @@ const ProjectsTable = () => {
     sortedEntries, 
     sortAlgorithm, 
     setSortAlgorithm,
-    showingEntriesText, 
     currentPage,
-    pageButtons,
-    handleOnNewPage
+    handleOnNewPage,
+    firstShownPageButton,
+    footerInfo
   } = useTable(projects);
 
   return (
-    <Table title="Projects" showingEntriesText={showingEntriesText} currentPage={currentPage} pageButtons={pageButtons} handleOnNewPage={handleOnNewPage}> 
-      <thead>
-        <tr>
-          <TableHeader title="Name" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute="name" /> 
-          <TableHeader title="Description" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute="description" />
-        </tr>
-      </thead>
+    <TableContainer title="Projects" currentPage={currentPage} handleOnNewPage={handleOnNewPage} firstShownPageButton={firstShownPageButton} footerInfo={footerInfo}>
+      <table>
+        <thead>
+          <tr>
+            <TableHeader title="Name" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute="name" /> 
+            <TableHeader title="Description" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute="description" />
+          </tr>
+        </thead>
 
-      <tbody>
-        {
-          sortedEntries.map(project => (
-            <TableRow key={project.id}>
-              <TableData>{ project.name }</TableData>
-              <TableData>{ project.description }</TableData>
-              <TableData>
-                <Link className="hover:underline text-purple-700" to={`/projects/${project.name.toLowerCase()}`}>Details</Link>
-              </TableData>
-            </TableRow>
-          ))
-        }
-      </tbody>
-    </Table>
+        <tbody>
+          {
+            sortedEntries.map(project => (
+              <TableRow key={project.id}>
+                <TableData>{ project.name }</TableData>
+                <TableData>{ project.description }</TableData>
+                <TableData>
+                  <Link className="hover:underline text-purple-700" to={`/projects/${project.name.toLowerCase()}`}>Details</Link>
+                </TableData>
+              </TableRow>
+            ))
+          }
+        </tbody>
+      </table>
+    </TableContainer>
   );
 }
 

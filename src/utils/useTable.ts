@@ -6,12 +6,6 @@ export type SortAlgorithm<T> = {
   isReversed: boolean;
 }
 
-export type PageButtons = {
-  firstPageButton: number;
-  secondPageButton: number | null;
-  thirdPageButton: number | null;
-}
-
 const newSortAlgorithm = <T>(sortAlgorithm: SortAlgorithm<T>) => {
   const { attribute, isReversed } = sortAlgorithm;
   return (a: T, b: T) => {
@@ -36,45 +30,41 @@ const newSortAlgorithm = <T>(sortAlgorithm: SortAlgorithm<T>) => {
 
 const useTable = <T extends {}>(entries: T[], entriesPerPage = 5) => {
   const [sortAlgorithm, setSortAlgorithm] = useState<SortAlgorithm<T>>({ attribute: null, isReversed: false });
-  const [firstShownEntry, setFirstShownEntry] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
-  const lastPage = Math.floor(entries.length / entriesPerPage);
-  const [pageButtons, setPageButtons] = useState<PageButtons>({
-    firstPageButton: 0,
-    secondPageButton: (entries.length / entriesPerPage) > 1 ? 1 : null,
-    thirdPageButton: (entries.length / (entriesPerPage * 2) > 1 ? 2 : null)
-  });
-  const showingEntriesText = `Showing ${firstShownEntry + 1} to ${Math.min(firstShownEntry + entriesPerPage, entries.length)} of ${entries.length} entries`;
+  const firstShownEntry = currentPage * entriesPerPage;
+  const lastPage = Math.ceil(entries.length / entriesPerPage) - 1;
+  const [firstShownPageButton, setFirstShownPageButton] = useState(0);
 
   const handleOnNewPage = (newPage: number) => {
     newPage = Math.max(0, Math.min(newPage, lastPage));
 
-    setCurrentPage(newPage);
-
-    if (pageButtons.secondPageButton && pageButtons.thirdPageButton) {
-      if (pageButtons.thirdPageButton < newPage) {
-        setPageButtons({
-          firstPageButton: pageButtons.firstPageButton + 1,
-          secondPageButton: pageButtons.secondPageButton + 1,
-          thirdPageButton: pageButtons.thirdPageButton + 1
-        });
-      }
-      else if (newPage < pageButtons.firstPageButton) {
-        setPageButtons({
-          firstPageButton: pageButtons.firstPageButton - 1,
-          secondPageButton: pageButtons.secondPageButton - 1,
-          thirdPageButton: pageButtons.thirdPageButton - 1
-        });
-      }
+    if (firstShownPageButton + 2 < newPage) {
+      setFirstShownPageButton(newPage - 2);
     }
-    
-    setFirstShownEntry(newPage * entriesPerPage);
+
+    if (newPage < firstShownPageButton) {
+      setFirstShownPageButton(newPage);
+    }
+
+    setCurrentPage(newPage);
   }
 
   const sortedEntries = [...entries].sort(newSortAlgorithm(sortAlgorithm))
     .filter((_, i) => (firstShownEntry <= i && i < firstShownEntry + entriesPerPage));
 
-  return { sortedEntries, sortAlgorithm, setSortAlgorithm, showingEntriesText, currentPage, pageButtons, handleOnNewPage };
+  return { 
+    sortedEntries, 
+    sortAlgorithm, 
+    setSortAlgorithm, 
+    currentPage, 
+    handleOnNewPage,
+    firstShownPageButton,
+    footerInfo: {
+      firstShownEntry,
+      entriesPerPage,
+      totalEntries: entries.length
+    } 
+  };
 }
 
 export default useTable;

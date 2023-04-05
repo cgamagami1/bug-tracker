@@ -2,7 +2,6 @@ import { useParams, Link } from "react-router-dom";
 import UsersTable from "./UsersTable";
 import TicketsTable from "../../components/TicketsTable";
 import DetailsCard from "../../components/DetailsCard";
-import Page from "../../components/Page";
 import PageRow from "../../components/PageRow";
 
 const ProjectPage = () => {
@@ -15,7 +14,7 @@ const ProjectPage = () => {
   );
 
   return (
-    <Page>
+    <div>
       <h2 className="text-xl mb-6"><Link to="/projects">My Projects</Link> &gt; <Link to={`/projects/${projectName}`}>{ projectName }</Link></h2>
 
       <PageRow>
@@ -23,7 +22,7 @@ const ProjectPage = () => {
         <UsersTable />
       </PageRow>
       <TicketsTable />
-    </Page>
+    </div>
   );
 }
 

@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import Table from "../../components/Table";
+import TableContainer from "../../components/TableContainer";
 import useTable from "../../utils/useTable";
 import TableHeader from "../../components/TableHeader";
 import TableRow from "../../components/TableRow";
@@ -14,7 +14,7 @@ export type TicketEdits<T> = {
 }
 
 const TicketHistoryTable = () => {
-  const tableEdits = [
+  const ticketEdit = [
     {
       id: 0,
       property: "title",
@@ -50,49 +50,45 @@ const TicketHistoryTable = () => {
       newValue: "Do That",
       dateChanged: DateTime.now()
     },
-    {
-      id: 5,
-      property: "title",
-      oldValue: "Do This",
-      newValue: "Do That",
-      dateChanged: DateTime.now()
-    },
+    
   ];
 
   const {
     sortedEntries,
     sortAlgorithm,
     setSortAlgorithm,
-    showingEntriesText,
     currentPage,
-    pageButtons,
-    handleOnNewPage
-  } = useTable(tableEdits);
+    handleOnNewPage,
+    firstShownPageButton,
+    footerInfo
+  } = useTable(ticketEdit);
 
   return (
-    <Table title="Ticket History" showingEntriesText={showingEntriesText} currentPage={currentPage} pageButtons={pageButtons} handleOnNewPage={handleOnNewPage}>
-      <thead>
-        <tr>
-          <TableHeader title="Property" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute={"property"} />
-          <TableHeader title="Old Value" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute={"oldValue"} />
-          <TableHeader title="New Value" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute={"newValue"} />
-          <TableHeader title="Date Changed" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute={"dateChanged"} />
-        </tr>
-      </thead>
+    <TableContainer title="Ticket History" currentPage={currentPage} handleOnNewPage={handleOnNewPage} firstShownPageButton={firstShownPageButton} footerInfo={footerInfo}>
+      <table>
+        <thead>
+          <tr>
+            <TableHeader title="Property" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute={"property"} />
+            <TableHeader title="Old Value" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute={"oldValue"} />
+            <TableHeader title="New Value" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute={"newValue"} />
+            <TableHeader title="Date Changed" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute={"dateChanged"} />
+          </tr>
+        </thead>
 
-      <tbody>
-        {
-          sortedEntries.map(tableEdit => (
-            <TableRow key={tableEdit.id}>
-              <TableData>{ tableEdit.property }</TableData>
-              <TableData>{ tableEdit.oldValue }</TableData>
-              <TableData>{ tableEdit.newValue }</TableData>
-              <TableData>{ tableEdit.dateChanged.toISODate() }</TableData>
-            </TableRow>
-          ))
-        }
-      </tbody>
-    </Table>
+        <tbody>
+          {
+            sortedEntries.map(ticketEdit => (
+              <TableRow key={ticketEdit.id}>
+                <TableData>{ ticketEdit.property }</TableData>
+                <TableData>{ ticketEdit.oldValue }</TableData>
+                <TableData>{ ticketEdit.newValue }</TableData>
+                <TableData>{ ticketEdit.dateChanged.toISODate() }</TableData>
+              </TableRow>
+            ))
+          }
+        </tbody>
+      </table>
+    </TableContainer>
   );
 }
 

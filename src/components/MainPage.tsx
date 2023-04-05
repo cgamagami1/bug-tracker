@@ -8,7 +8,7 @@ const MainPage = () => {
   const [isSideBarOpen, setIsSideBarOpen] = useState(true);
   const isDesktop = useMediaQuery('(min-width: 1536px)', (isDesktop) => setIsSideBarOpen(isDesktop));
 
-  const handleOnSideBarClick = () => {
+  const handleOnCloseSideBar = () => {
     if (!isDesktop) {
       setIsSideBarOpen(false);
     }
@@ -18,8 +18,10 @@ const MainPage = () => {
     <div className="h-screen flex flex-col">
       <HeaderBar handleOnMenuClick={() => setIsSideBarOpen(isbo => !isbo)} />
       <div className="flex flex-grow">
-        <SideBar isOpen={isSideBarOpen} handleOnClick={handleOnSideBarClick} />
-        <Outlet />
+        <SideBar isOpen={isSideBarOpen} handleOnClick={handleOnCloseSideBar} />
+        <div className="flex-grow bg-gray-100 p-4 lg:p-8 text-gray-700" onClick={handleOnCloseSideBar}>
+          <Outlet />
+        </div>
       </div>
     </div>
   );

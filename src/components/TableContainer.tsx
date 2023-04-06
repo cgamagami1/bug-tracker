@@ -11,11 +11,12 @@ type TableProps = {
     firstShownEntry: number;
     entriesPerPage: number;
     totalEntries: number;
-  }
+  };
+  hideOnMobile?: boolean;
   children: ReactNode;
 }
 
-const TableContainer = ({ title, currentPage, handleOnNewPage, firstShownPageButton, footerInfo, children }: TableProps) => {
+const TableContainer = ({ title, currentPage, handleOnNewPage, firstShownPageButton, footerInfo, hideOnMobile, children }: TableProps) => {
   const { firstShownEntry, entriesPerPage, totalEntries } = footerInfo;
   const pageCount = Math.ceil(totalEntries / entriesPerPage);
 
@@ -34,7 +35,7 @@ const TableContainer = ({ title, currentPage, handleOnNewPage, firstShownPageBut
   }
 
   return (
-    <div className="bg-white rounded-md px-6 py-2 flex-grow text-sm text-left flex flex-col">
+    <div className={`bg-white rounded-md px-6 py-2 flex-grow text-sm text-left flex-col ${hideOnMobile ? "hidden lg:flex" : "flex"}`}>
       <h3 className="text-xl p-2 border-b border-gray-400">{ title }</h3>
 
       { children }

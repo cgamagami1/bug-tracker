@@ -64,7 +64,7 @@ const TicketHistoryTable = () => {
   } = useTable(ticketEdit);
 
   return (
-    <TableContainer title="Ticket History" currentPage={currentPage} handleOnNewPage={handleOnNewPage} firstShownPageButton={firstShownPageButton} footerInfo={footerInfo}>
+    <TableContainer title="Ticket History" currentPage={currentPage} handleOnNewPage={handleOnNewPage} firstShownPageButton={firstShownPageButton} footerInfo={footerInfo} hideOnMobile>
       <table>
         <thead>
           <tr>

@@ -19,7 +19,7 @@ const MainPage = () => {
       <HeaderBar handleOnMenuClick={() => setIsSideBarOpen(isbo => !isbo)} />
       <div className="flex flex-grow">
         <SideBar isOpen={isSideBarOpen} handleOnClick={handleOnCloseSideBar} />
-        <div className="flex-grow bg-gray-100 p-4 lg:p-8 text-gray-700" onClick={handleOnCloseSideBar}>
+        <div className={`flex-grow bg-gray-100 p-4 lg:p-8 text-gray-700 ${isSideBarOpen ? "2xl:ml-72" : ""}`} onClick={handleOnCloseSideBar}>
           <Outlet />
         </div>
       </div>

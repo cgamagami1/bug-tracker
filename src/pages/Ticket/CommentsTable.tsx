@@ -44,6 +44,24 @@ const CommentsTable = () => {
       message: "This is a new comment",
       datePosted: DateTime.now()
     },
+    {
+      id: 5,
+      posterId: 0,
+      message: "This is a new comment",
+      datePosted: DateTime.now()
+    },
+    {
+      id: 6,
+      posterId: 0,
+      message: "This is a new comment",
+      datePosted: DateTime.now()
+    },
+    {
+      id: 7,
+      posterId: 0,
+      message: "This is a comment This is a comment This is a comment This is a comment This is a comment This is a comment This is a comment This is a comment This is a comment This is a comment",
+      datePosted: DateTime.now()
+    },
   ];
   const users = [
     {
@@ -112,18 +130,18 @@ const CommentsTable = () => {
   return (
     <TableContainer title="Comments" currentPage={currentPage} handleOnNewPage={handleOnNewPage} firstShownPageButton={firstShownPageButton} footerInfo={footerInfo}>
 
-      <form className="px-2 pt-4 flex gap-4" onSubmit={handleOnAddComment}>
-        <input className="border flex-grow rounded-md px-2 focus:outline-none" type="text" value={newComment} onChange={handleOnNewCommentChange} placeholder="Add a comment..." />
-        <input type="submit" className="bg-purple-500 text-white p-2 select-none rounded-md hover:cursor-pointer" value="Add Comment" />
+      <form className="px-2 pt-4 flex flex-col md:flex-row gap-4 mb-6" onSubmit={handleOnAddComment}>
+        <input className="border flex-grow rounded-md px-2 focus:outline-none h-9" type="text" value={newComment} onChange={handleOnNewCommentChange} placeholder="Add a comment..." />
+        <input type="submit" className="bg-purple-500 text-white p-2 select-none rounded-md hover:cursor-pointer hover:bg-purple-600" value="Add Comment" />
       </form>
 
       {
         sortedEntries.map(comment => (
-          <div key={comment.id} className="flex px-2 py-4 items-start gap-4 justify-between">
+          <div key={comment.id} className="flex px-2 mb-6 items-start gap-4 justify-between">
             <img className="rounded-full w-10" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" alt="profile picture" />
 
             <div className="flex-grow">
-              <p><span className="text-base font-bold">{ users.find(user => user.id === comment.posterId)?.name }</span> { comment.datePosted.toISODate() }</p>
+              <p><span className="font-bold">{ users.find(user => user.id === comment.posterId)?.name }</span> { comment.datePosted.toISODate() }</p>
               <p className="inline-block">{ comment.message }</p>
             </div>
 

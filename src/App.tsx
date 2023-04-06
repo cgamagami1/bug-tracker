@@ -5,6 +5,8 @@ import MyProjectsPage from "./pages/MyProjects/MyProjectsPage";
 import MyTicketsPage from "./pages/MyTickets/MyTicketsPage";
 import ProjectPage from "./pages/Project/ProjectPage";
 import TicketPage from "./pages/Ticket/TicketPage";
+import EditTicketPage from "./pages/EditTicket/EditTicketPage";
+import EditProjectPage from "./pages/EditProject/EditProjectPage";
 
 const App = () => {
 
@@ -14,8 +16,10 @@ const App = () => {
         <Route index element={<DashboardPage />} />
         <Route path="projects" element={<MyProjectsPage />} />
         <Route path="projects/:projectName" element={<ProjectPage />} />
+        <Route path="projects/:projectName/edit" element={<EditProjectPage />} />
         <Route path="tickets" element={<MyTicketsPage />} />
         <Route path="tickets/:ticketId" element={<TicketPage />} />
+        <Route path="tickets/:ticketId/edit" element={<EditTicketPage />} />
         <Route path="manage" element={<div>Manage Users</div>} />
         <Route path="settings" element={<div>Settings</div>} />
       </Route>

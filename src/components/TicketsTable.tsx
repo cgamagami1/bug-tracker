@@ -257,7 +257,7 @@ const TicketsTable = ({ entriesPerPage = 5 }: TicketsTableProps) => {
                 <TableData hideOnMobile>{ users.find((user) => user.id === ticket.submitterId)?.name }</TableData>
                 <TableData hideOnMobile>{ users.find(user => user.id === ticket.developerId)?.name }</TableData>
                 <TableData>{ ticket.status }</TableData>
-                <TableData>{ ticket.priority }</TableData>
+                <TableData hideOnMobile>{ ticket.priority }</TableData>
                 <TableData hideOnMobile>{ ticket.dateCreated.toISODate() }</TableData>
                 <TableData>
                   <Link className="hover:underline text-purple-700" to={`/tickets/${ticket.id}`}>More Details</Link>

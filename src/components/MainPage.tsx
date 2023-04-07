@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
-import { TicketProvider } from "../context/TicketContext";
+import { OrganizationProvider } from "../context/OrganizationContext";
 import SideBar from "./SideBar";
 import HeaderBar from "./HeaderBar";
 import useMediaQuery from "../utils/useMediaQuery";
@@ -16,7 +16,7 @@ const MainPage = () => {
   }
 
   return (
-    <TicketProvider>
+    <OrganizationProvider>
       <div className="h-screen flex flex-col">
         <HeaderBar handleOnMenuClick={() => setIsSideBarOpen(isbo => !isbo)} />
         <div className="flex flex-grow">
@@ -26,7 +26,7 @@ const MainPage = () => {
           </div>
         </div>
       </div>
-    </TicketProvider>
+    </OrganizationProvider>
   );
 }
 

@@ -3,66 +3,11 @@ import TableHeader from "../../components/TableHeader";
 import useTable from "../../utils/useTable";
 import TableRow from "../../components/TableRow";
 import TableData from "../../components/TableData";
-
-export enum ROLE {
-  ADMIN = "Admin",
-  PROJECT_MANAGER = "Project Manager",
-  SUBMITTER = "Submitter",
-  DEVELOPER = "Developer"
-}
-
-export type User = {
-  id: number;
-  name: string;
-  email: string;
-  role: ROLE;
-}
+import { useContext } from "react";
+import { OrganizationContext } from "../../context/OrganizationContext";
 
 const UsersTable = () => {
-  const users = [
-    {
-      id: 0,
-      name: "john1",
-      email: "john@email.com",
-      role: ROLE.DEVELOPER,
-    },
-    {
-      id: 1,
-      name: "john2",
-      email: "john@email.com",
-      role: ROLE.DEVELOPER,
-    },
-    {
-      id: 2,
-      name: "john3",
-      email: "john@email.com",
-      role: ROLE.DEVELOPER,
-    },
-    {
-      id: 3,
-      name: "john4",
-      email: "john@email.com",
-      role: ROLE.DEVELOPER,
-    },
-    {
-      id: 4,
-      name: "john5",
-      email: "john@email.com",
-      role: ROLE.DEVELOPER,
-    },
-    {
-      id: 5,
-      name: "john6",
-      email: "john@email.com",
-      role: ROLE.DEVELOPER,
-    },
-    {
-      id: 6,
-      name: "john7",
-      email: "john@email.com",
-      role: ROLE.DEVELOPER,
-    },
-  ]
+  const { users } = useContext(OrganizationContext);
 
   const { 
     sortedEntries, 

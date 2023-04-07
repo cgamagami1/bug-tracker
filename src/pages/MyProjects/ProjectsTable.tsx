@@ -5,10 +5,10 @@ import useTable from "../../utils/useTable";
 import TableData from "../../components/TableData";
 import TableRow from "../../components/TableRow";
 import { useContext } from "react";
-import { TicketContext } from "../../context/TicketContext";
+import { OrganizationContext } from "../../context/OrganizationContext";
 
 const ProjectsTable = () => {
-  const { projects } = useContext(TicketContext);
+  const { projects } = useContext(OrganizationContext);
 
   const { 
     sortedEntries, 

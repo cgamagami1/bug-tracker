@@ -31,6 +31,20 @@ export type Project = {
   endDate: DateTime | null;
 }
 
+export enum ROLE {
+  ADMIN = "Admin",
+  PROJECT_MANAGER = "Project Manager",
+  SUBMITTER = "Submitter",
+  DEVELOPER = "Developer"
+}
+
+export type User = {
+  id: number;
+  name: string;
+  email: string;
+  role: ROLE;
+}
+
 const tickets = [
   {
     id: 0,
@@ -218,26 +232,71 @@ const projects = [
     endDate: DateTime.now()
   }
 ]
+const users = [
+  {
+    id: 0,
+    name: "john1",
+    email: "john@email.com",
+    role: ROLE.DEVELOPER,
+  },
+  {
+    id: 1,
+    name: "john2",
+    email: "john@email.com",
+    role: ROLE.DEVELOPER,
+  },
+  {
+    id: 2,
+    name: "john3",
+    email: "john@email.com",
+    role: ROLE.DEVELOPER,
+  },
+  {
+    id: 3,
+    name: "john4",
+    email: "john@email.com",
+    role: ROLE.DEVELOPER,
+  },
+  {
+    id: 4,
+    name: "john5",
+    email: "john@email.com",
+    role: ROLE.DEVELOPER,
+  },
+  {
+    id: 5,
+    name: "john6",
+    email: "john@email.com",
+    role: ROLE.DEVELOPER,
+  },
+  {
+    id: 6,
+    name: "john7",
+    email: "john@email.com",
+    role: ROLE.DEVELOPER,
+  },
+]
 
-type TicketContextValue = {
+type OrganizationContextValue = {
   tickets: Ticket[];
   projects: Project[];
+  users: User[];
 }
 
-export const TicketContext = createContext({} as TicketContextValue);
+export const OrganizationContext = createContext({} as OrganizationContextValue);
 
 type TicketProviderProps = {
   children: ReactNode;
 }
 
-export const TicketProvider = ({ children }: TicketProviderProps) => {
-  
+export const OrganizationProvider = ({ children }: TicketProviderProps) => {
   const value = {
     tickets,
-    projects
+    projects,
+    users
   }
 
   return (
-    <TicketContext.Provider value={value}>{ children }</TicketContext.Provider>
+    <OrganizationContext.Provider value={value}>{ children }</OrganizationContext.Provider>
   );
 }

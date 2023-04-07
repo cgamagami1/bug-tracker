@@ -4,43 +4,16 @@ import TableHeader from "./TableHeader";
 import TableRow from "./TableRow";
 import TableData from "./TableData";
 import useTable from "../utils/useTable";
-import { ROLE } from "../pages/Project/UsersTable";
 import { Link } from "react-router-dom";
 import { useContext } from "react";
-import { TicketContext } from "../context/TicketContext";
+import { OrganizationContext } from "../context/OrganizationContext";
 
 type TicketsTableProps = {
   entriesPerPage?: number;
 }
 
 const TicketsTable = ({ entriesPerPage = 5 }: TicketsTableProps) => {
-  const { tickets } = useContext(TicketContext);
-  const users = [
-    {
-      id: 0,
-      name: "Johnathan",
-      email: "john@email.com",
-      role: ROLE.DEVELOPER,
-    },
-    {
-      id: 1,
-      name: "john",
-      email: "john@email.com",
-      role: ROLE.DEVELOPER,
-    },
-    {
-      id: 2,
-      name: "Johnathan",
-      email: "john@email.com",
-      role: ROLE.DEVELOPER,
-    },
-    {
-      id: 3,
-      name: "john",
-      email: "john@email.com",
-      role: ROLE.DEVELOPER,
-    },
-  ]
+  const { tickets, users } = useContext(OrganizationContext);
 
   const { 
     sortedEntries, 

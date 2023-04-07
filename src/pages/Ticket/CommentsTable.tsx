@@ -2,8 +2,8 @@ import { DateTime } from "luxon";
 import useTable from "../../utils/useTable";
 import TableContainer from "../../components/TableContainer";
 import trash from "../../assets/trash.svg";
-import { ROLE } from "../Project/UsersTable";
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useContext, useState } from "react";
+import { OrganizationContext } from "../../context/OrganizationContext";
 
 export type Comment = {
   id: number;
@@ -63,50 +63,7 @@ const CommentsTable = () => {
       datePosted: DateTime.now()
     },
   ];
-  const users = [
-    {
-      id: 0,
-      name: "john1",
-      email: "john@email.com",
-      role: ROLE.DEVELOPER,
-    },
-    {
-      id: 1,
-      name: "john2",
-      email: "john@email.com",
-      role: ROLE.DEVELOPER,
-    },
-    {
-      id: 2,
-      name: "john3",
-      email: "john@email.com",
-      role: ROLE.DEVELOPER,
-    },
-    {
-      id: 3,
-      name: "john4",
-      email: "john@email.com",
-      role: ROLE.DEVELOPER,
-    },
-    {
-      id: 4,
-      name: "john5",
-      email: "john@email.com",
-      role: ROLE.DEVELOPER,
-    },
-    {
-      id: 5,
-      name: "john6",
-      email: "john@email.com",
-      role: ROLE.DEVELOPER,
-    },
-    {
-      id: 6,
-      name: "john7",
-      email: "john@email.com",
-      role: ROLE.DEVELOPER,
-    },
-  ]
+  const { users } = useContext(OrganizationContext);
 
   const [newComment, setNewComment] = useState("");
 

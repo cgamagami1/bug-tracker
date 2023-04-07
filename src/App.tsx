@@ -7,6 +7,8 @@ import ProjectPage from "./pages/Project/ProjectPage";
 import TicketPage from "./pages/Ticket/TicketPage";
 import EditTicketPage from "./pages/EditTicket/EditTicketPage";
 import EditProjectPage from "./pages/EditProject/EditProjectPage";
+import SignInPage from "./pages/SignIn/SignInPage";
+import SignUpPage from "./pages/SignUp/SignUpPage";
 
 const App = () => {
 
@@ -23,6 +25,8 @@ const App = () => {
         <Route path="manage" element={<div>Manage Users</div>} />
         <Route path="settings" element={<div>Settings</div>} />
       </Route>
+      <Route path="/signin" element={<SignInPage />} />
+      <Route path="/signup" element={<SignUpPage />} />
     </Routes>
     
   )

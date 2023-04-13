@@ -23,14 +23,6 @@ export type Ticket = {
   dateCreated: DateTime;
 }
 
-export type Project = {
-  id: number;
-  title: string;
-  description: string;
-  startDate: DateTime | null;
-  endDate: DateTime | null;
-}
-
 export enum ROLE {
   ADMIN = "Admin",
   PROJECT_MANAGER = "Project Manager",
@@ -209,29 +201,6 @@ const tickets = [
     dateCreated: DateTime.now()
   },
 ];
-const projects = [
-  {
-    id: 0,
-    title: "Mobile app",
-    description: "The mobile app for our new product.",
-    startDate: DateTime.now(),
-    endDate: DateTime.now()
-  },
-  {
-    id: 1,
-    title: "Web app",
-    description: "The web app for our new product.",
-    startDate: DateTime.now(),
-    endDate: DateTime.now()
-  },
-  {
-    id: 2,
-    title: "Desktop app",
-    description: "The desktop app for our new product.",
-    startDate: DateTime.now(),
-    endDate: DateTime.now()
-  }
-]
 const users = [
   {
     id: 0,
@@ -279,7 +248,6 @@ const users = [
 
 type OrganizationContextValue = {
   tickets: Ticket[];
-  projects: Project[];
   users: User[];
 }
 
@@ -292,7 +260,6 @@ type TicketProviderProps = {
 export const OrganizationProvider = ({ children }: TicketProviderProps) => {
   const value = {
     tickets,
-    projects,
     users
   }
 

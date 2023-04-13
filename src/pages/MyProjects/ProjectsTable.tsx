@@ -5,10 +5,10 @@ import useTable from "../../utils/useTable";
 import TableData from "../../components/TableData";
 import TableRow from "../../components/TableRow";
 import { useContext } from "react";
-import { OrganizationContext } from "../../context/OrganizationContext";
+import { ProjectContext } from "../../context/ProjectContext";
 
 const ProjectsTable = () => {
-  const { projects } = useContext(OrganizationContext);
+  const { projects } = useContext(ProjectContext);
 
   const { 
     sortedEntries, 
@@ -37,7 +37,7 @@ const ProjectsTable = () => {
                 <TableData>{ project.title }</TableData>
                 <TableData>{ project.description }</TableData>
                 <TableData>
-                  <Link className="hover:underline text-purple-700" to={`/projects/${project.title.toLowerCase()}`}>Details</Link>
+                  <Link className="hover:underline text-purple-700" to={`/projects/${project.id}`}>Details</Link>
                 </TableData>
               </TableRow>
             ))

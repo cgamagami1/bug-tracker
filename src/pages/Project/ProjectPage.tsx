@@ -4,11 +4,15 @@ import TicketsTable from "../../components/TicketsTable";
 import DetailsCard from "../../components/DetailsCard";
 import DetailsCardItem from "../../components/DetailsCardItem";
 import PageRow from "../../components/PageRow";
+import { useContext } from "react";
+import { ProjectContext } from "../../context/ProjectContext";
 
 const ProjectPage = () => {
-  const { projectName } = useParams();
+  const { projectId } = useParams();
+  const { projects } = useContext(ProjectContext);
+  const project = projects.find(project => project.id === projectId);
 
-  if (!projectName) return (
+  if (!project) return (
     <div>
       This project does not exist
     </div>
@@ -16,9 +20,10 @@ const ProjectPage = () => {
 
   return (
     <div>
-      <h2 className="text-xl mb-6"><Link to="/projects">My Projects</Link> &gt; <Link to={`/projects/${projectName}`}>{ projectName }</Link></h2>
+      <h2 className="text-xl mb-6"><Link to="/projects">My Projects</Link> &gt; <Link to={`/projects/${projectId}`}>{ project.title }</Link></h2>
+
       <PageRow>
-        <DetailsCard title={projectName}>
+        <DetailsCard title={project.title}>
           <DetailsCardItem name="Property" value="Value" />
           <DetailsCardItem name="Property" value="Value" />
           <DetailsCardItem name="Property" value="Value" />

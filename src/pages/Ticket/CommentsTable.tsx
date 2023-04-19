@@ -3,7 +3,7 @@ import useTable from "../../utils/useTable";
 import TableContainer from "../../components/TableContainer";
 import trash from "../../assets/trash.svg";
 import { ChangeEvent, FormEvent, useContext, useState } from "react";
-import { OrganizationContext } from "../../context/OrganizationContext";
+import { TeamMemberContext } from "../../context/TeamMemberContext";
 
 export type Comment = {
   id: number;
@@ -63,8 +63,7 @@ const CommentsTable = () => {
       datePosted: DateTime.now()
     },
   ];
-  const { users } = useContext(OrganizationContext);
-
+  const { teamMembers } = useContext(TeamMemberContext);
   const [newComment, setNewComment] = useState("");
 
   const { 
@@ -98,7 +97,7 @@ const CommentsTable = () => {
             <img className="rounded-full w-10" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" alt="profile picture" />
 
             <div className="flex-grow">
-              <p><span className="font-bold">{ users.find(user => user.id === comment.posterId)?.name }</span> { comment.datePosted.toISODate() }</p>
+              <p><span className="font-bold">REPLACE</span> { comment.datePosted.toISODate() }</p>
               <p className="inline-block">{ comment.message }</p>
             </div>
 

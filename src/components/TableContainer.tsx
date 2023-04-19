@@ -41,7 +41,7 @@ const TableContainer = ({ title, currentPage, handleOnNewPage, firstShownPageBut
       { children }
 
       <div className="flex flex-col md:flex-row gap-2 justify-between p-2 items-center select-none border-t border-gray-400">
-        <span>Showing {firstShownEntry + 1} to {Math.min(firstShownEntry + entriesPerPage, totalEntries)} of {totalEntries} entries</span>
+        <span>Showing {Math.min(firstShownEntry + 1, totalEntries)} to {Math.min(firstShownEntry + entriesPerPage, totalEntries)} of {totalEntries} entries</span>
 
         <div className="flex gap-2">
           <img className="border w-6 py-1 text-center rounded-md hover:cursor-pointer" src={left} alt="left arrow" onClick={handleOnPreviousPage} />

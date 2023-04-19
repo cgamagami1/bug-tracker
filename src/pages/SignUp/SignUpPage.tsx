@@ -1,11 +1,12 @@
-import { AuthError, AuthErrorCodes, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { AuthError, AuthErrorCodes, createUserWithEmailAndPassword } from "firebase/auth";
 import { FormEvent, useState, ChangeEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { auth } from "../../utils/firebase-config";
-import Button from "../../components/Button";
+import { auth, db } from "../../utils/firebase-config";
+import Button, { BUTTON_STYLES } from "../../components/Button";
+import { doc, setDoc } from "firebase/firestore";
 
 const SignUpPage = () => {
-  const [formFields, setFormFields] = useState({ name: "", email: "", password: "", confirmPassword: "" });
+  const [formFields, setFormFields] = useState({ firstName: "", lastName: "", email: "", password: "", confirmPassword: "" });
   const [errorMessage, setErrorMessage] = useState("");
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ const SignUpPage = () => {
 
     setIsAuthLoading(true);
 
-    if (!formFields.name || !formFields.email || !formFields.password || !formFields.confirmPassword) {
+    if (!formFields.firstName || !formFields.lastName || !formFields.email || !formFields.password || !formFields.confirmPassword) {
       setErrorMessage("One or more required fields are missing");
     }
     else if (formFields.password !== formFields.confirmPassword) {
@@ -24,7 +25,14 @@ const SignUpPage = () => {
     else {
       try {
         const { user } = await createUserWithEmailAndPassword(auth, formFields.email, formFields.password);
-        await updateProfile(user, { displayName: formFields.name });
+
+        await setDoc(doc(db, "users", user.uid), { 
+          firstName: formFields.firstName, 
+          lastName: formFields.lastName,
+          email: formFields.email,
+          projects: []  
+        });
+
         navigate("/");
       }
       catch (error) {
@@ -45,7 +53,7 @@ const SignUpPage = () => {
       }
     }
 
-    setFormFields({ name: "", email: "", password: "", confirmPassword: "" });
+    setFormFields({ firstName: "", lastName: "", email: "", password: "", confirmPassword: "" });
     setIsAuthLoading(false);
   }
 
@@ -56,9 +64,15 @@ const SignUpPage = () => {
       <form className="bg-white rounded-md px-6 py-2 w-96 flex flex-col" onSubmit={handleOnSubmit}>
         <h3 className="text-xl p-2 border-b border-gray-400">Sign Up</h3>
 
-        <div className="flex flex-col gap-1 p-2">
-          <label htmlFor="name">Name</label>
-          <input className="focus:outline-none border rounded-md h-9 px-2" type="text" id="name" value={formFields.name} onChange={handleOnFieldChange} />
+        <div className="flex justify-between">
+          <div className="flex flex-col gap-1 p-2 w-40">
+            <label htmlFor="firstName">First Name</label>
+            <input className="focus:outline-none border rounded-md h-9 px-2" type="text" id="firstName" value={formFields.firstName} onChange={handleOnFieldChange} />
+          </div>
+          <div className="flex flex-col gap-1 p-2 w-40">
+            <label htmlFor="firstName">Last Name</label>
+            <input className="focus:outline-none border rounded-md h-9 px-2" type="text" id="lastName" value={formFields.lastName} onChange={handleOnFieldChange} />
+          </div>
         </div>
         <div className="flex flex-col gap-1 p-2">
           <label htmlFor="email">Email</label>
@@ -73,7 +87,7 @@ const SignUpPage = () => {
           <input className="focus:outline-none border rounded-md h-9 px-2" type="password" id="confirmPassword" value={formFields.confirmPassword} onChange={handleOnFieldChange} />
         </div>
 
-        <Button type="submit" title="Sign Up" isLoading={isAuthLoading} />
+        <Button type="submit" title="Sign Up" isLoading={isAuthLoading} style={BUTTON_STYLES.AUTH} />
         <span className="text-center p-3">Already have an account? <Link className="text-purple-600 hover:underline" to="/signin">Sign In</Link></span>
         <span className="text-center text-red-600">{ errorMessage }</span>
       </form>

@@ -9,11 +9,7 @@ const EditProjectPage = () => {
   const { projects } = useContext(ProjectContext);
   const project = projects.find(project => project.id === projectId);
 
-  if (!project) return (
-    <div>
-      This project does not exist
-    </div>
-  );
+  if (!project) return <></>;
 
   return (
     <div>

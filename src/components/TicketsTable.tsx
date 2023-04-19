@@ -6,14 +6,16 @@ import TableData from "./TableData";
 import useTable from "../utils/useTable";
 import { Link } from "react-router-dom";
 import { useContext } from "react";
-import { OrganizationContext } from "../context/OrganizationContext";
+import { TicketContext } from "../context/TicketContext";
+import { TeamMemberContext } from "../context/TeamMemberContext";
 
 type TicketsTableProps = {
   entriesPerPage?: number;
 }
 
 const TicketsTable = ({ entriesPerPage = 5 }: TicketsTableProps) => {
-  const { tickets, users } = useContext(OrganizationContext);
+  const { teamMembers } = useContext(TeamMemberContext);
+  const { tickets } = useContext(TicketContext);
 
   const { 
     sortedEntries, 
@@ -44,8 +46,8 @@ const TicketsTable = ({ entriesPerPage = 5 }: TicketsTableProps) => {
             sortedEntries.map(ticket => (
               <TableRow key={ticket.id}>
                 <TableData>{ ticket.title }</TableData>
-                <TableData hideOnMobile>{ users.find((user) => user.id === ticket.submitterId)?.name }</TableData>
-                <TableData hideOnMobile>{ users.find(user => user.id === ticket.developerId)?.name }</TableData>
+                <TableData hideOnMobile>REPLACE</TableData>
+                <TableData hideOnMobile>REPLACE</TableData>
                 <TableData>{ ticket.status }</TableData>
                 <TableData hideOnMobile>{ ticket.priority }</TableData>
                 <TableData hideOnMobile>{ ticket.dateCreated.toISODate() }</TableData>

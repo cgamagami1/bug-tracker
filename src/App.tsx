@@ -11,6 +11,7 @@ import SignInPage from "./pages/SignIn/SignInPage";
 import SignUpPage from "./pages/SignUp/SignUpPage";
 import NewProjectPage from "./pages/NewProject/NewProjectPage";
 import NewTicketPage from "./pages/NewTicket/NewTicketPage";
+import SignOutPage from "./pages/SignOut/SignOutPage";
 
 const App = () => {
   return (
@@ -30,6 +31,7 @@ const App = () => {
       </Route>
       <Route path="/signin" element={<SignInPage />} />
       <Route path="/signup" element={<SignUpPage />} />
+      <Route path="/signout" element={<SignOutPage />} />
     </Routes>
   );
 }

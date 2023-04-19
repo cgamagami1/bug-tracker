@@ -1,6 +1,6 @@
 import { ChangeEvent, FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Button from "../../components/Button";
+import Button, { BUTTON_STYLES } from "../../components/Button";
 import { AuthError, AuthErrorCodes, signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../utils/firebase-config";
 
@@ -56,7 +56,7 @@ const SignInPage = () => {
           <input className="focus:outline-none border rounded-md h-9 px-2" type="password" id="password" value={formFields.password} onChange={handleOnFieldChange} />
         </div>
 
-        <Button title="Sign In" type="submit" isLoading={isAuthLoading} />
+        <Button title="Sign In" type="submit" isLoading={isAuthLoading} style={BUTTON_STYLES.AUTH} />
         <span className="text-center p-3">Don't have an account? <Link className="text-purple-600 hover:underline" to="/signup">Sign Up</Link></span>
         <span className="text-center text-red-600">{ errorMessage }</span>
       </form>

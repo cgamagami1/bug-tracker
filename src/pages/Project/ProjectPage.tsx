@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import UsersTable from "./UsersTable";
+import TeamMemberTable from "./TeamMemberTable";
 import TicketsTable from "../../components/TicketsTable";
 import DetailsCard from "../../components/DetailsCard";
 import DetailsCardItem from "../../components/DetailsCardItem";
@@ -12,11 +12,7 @@ const ProjectPage = () => {
   const { projects } = useContext(ProjectContext);
   const project = projects.find(project => project.id === projectId);
 
-  if (!project) return (
-    <div>
-      This project does not exist
-    </div>
-  );
+  if (!project) return <></>;
 
   return (
     <div>
@@ -24,16 +20,11 @@ const ProjectPage = () => {
 
       <PageRow>
         <DetailsCard title={project.title}>
-          <DetailsCardItem name="Property" value="Value" />
-          <DetailsCardItem name="Property" value="Value" />
-          <DetailsCardItem name="Property" value="Value" />
-          <DetailsCardItem name="Property" value="Value" />
-          <DetailsCardItem name="Property" value="Value" />
-          <DetailsCardItem name="Property" value="Value" />
-          <DetailsCardItem name="Property" value="Value" />
-          <DetailsCardItem name="Property" value="Value" />
+          <DetailsCardItem name="Description" value={project.description} spanTwoColumns />
+          {project.startDate && <DetailsCardItem name="Start Date" value={project.startDate.toISODate()} />}
+          {project.endDate && <DetailsCardItem name="End Date" value={project.endDate.toISODate()} />}
         </DetailsCard>
-        <UsersTable />
+        <TeamMemberTable projectId={project.id} />
       </PageRow>
       <TicketsTable />
     </div>

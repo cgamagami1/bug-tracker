@@ -1,10 +1,9 @@
 import { ChangeEvent, FormEvent, useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { DateTime } from "luxon";
-import { collection, addDoc, Timestamp, updateDoc, doc } from "firebase/firestore";
-import { db } from "../utils/firebase-config";
 import { UserContext } from "../context/UserContext";
-import { Project } from "../context/ProjectContext";
+import { Project, ProjectContext } from "../context/ProjectContext";
+import Button, { BUTTON_STYLES } from "./Button";
 
 type FormFields = {
   title: string;
@@ -25,34 +24,36 @@ const ProjectMenu = ({ editedItem }: ProjectMenuProps) => {
     endDate: editedItem?.endDate ?? null
   });
 
+  const [isLoading, setIsLoading] = useState(false);
   const { user } = useContext(UserContext);
+  const { addProject, updateProject } = useContext(ProjectContext);
   const navigate = useNavigate();
+
+  if (!user) return <></>;
 
   const handleOnSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
 
     const projectData = {
       title: formFields.title,
       description: formFields.description,
-      startDate: formFields.startDate && Timestamp.fromDate(formFields.startDate.toJSDate()),
-      endDate: formFields.endDate && Timestamp.fromDate(formFields.endDate.toJSDate())
+      startDate: formFields.startDate,
+      endDate: formFields.endDate
     }
 
     if (editedItem) {
-      await updateDoc(doc(db, "projects", editedItem.id), projectData);
-
-      navigate("..");
+      await updateProject(editedItem.id, projectData);
+      navigate(`/projects/${editedItem.id}`);
     }
     else {
-      await addDoc(collection(db, "projects"), {
-        ...projectData,
-        ownerId: user?.uid,
-      });
-  
+      await addProject(projectData, user.uid);
       navigate("/projects");
     }
-  }
 
+    setIsLoading(false);
+  }
+  
   const handleOnChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setFormFields({ ...formFields, [e.target.id]: e.target.value });
   const handleOnDateChange = (e: ChangeEvent<HTMLInputElement>) => setFormFields({ ...formFields, [e.target.id]: DateTime.fromISO(e.target.value)});
 
@@ -78,12 +79,15 @@ const ProjectMenu = ({ editedItem }: ProjectMenuProps) => {
           
           <div className="flex flex-col">
             <label className="font-bold" htmlFor="endDate">End Date</label>
-            <input className="focus:outline-none border rounded-md h-9 w-40 px-2" id="endDate" type="date" onChange={handleOnDateChange} value={formFields.startDate?.toISODate() ?? ""} />
+            <input className="focus:outline-none border rounded-md h-9 w-40 px-2" id="endDate" type="date" onChange={handleOnDateChange} value={formFields.endDate?.toISODate() ?? ""} />
           </div>
 
           <div className="flex gap-4">
-            <input className="bg-purple-500 text-white p-2 select-none rounded-md hover:cursor-pointer hover:bg-purple-600 w-40" type="submit" value="Save" />
-            <Link to={editedItem ? ".." : "/projects"} relative="path" className="bg-gray-200 p-2 select-none rounded-md hover:cursor-pointer hover:bg-gray-300 w-40 text-center">Cancel</Link>
+            <Button title="Save" type="submit" isLoading={isLoading} />
+
+            <Link to={editedItem ? ".." : "/projects"} relative="path">
+              <Button title="Cancel" style={BUTTON_STYLES.GRAY} />
+            </Link>
           </div>
         </form>
       </div>

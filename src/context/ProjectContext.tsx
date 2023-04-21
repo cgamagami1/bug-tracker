@@ -34,12 +34,10 @@ export const ProjectProvider = ({ children }: ProjectProviderProps) => {
   const fetchProjects = async () => {
     if (!user) return [];
 
-    const userDocRef = await getDoc(doc(db, "users", user.uid));
+    const projectsSnapshot = await getDocs(query(collection(db, "team members"), where("userId", "==", user.uid)));
 
-    if (!userDocRef.exists()) throw new Error("Could not retrieve user document");
-
-    const projectDocRefs = await Promise.all(userDocRef.data().projects.map(async (project: string) => {
-      return await getDoc(doc(db, "projects", project));
+    const projectDocRefs = await Promise.all(projectsSnapshot.docs.map(async document => {
+      return await getDoc(doc(db, "projects", document.data().projectId));
     }));
 
     return projectDocRefs.map(docRef => {
@@ -54,7 +52,7 @@ export const ProjectProvider = ({ children }: ProjectProviderProps) => {
       } as Project;
     });
   }
-
+  
   const addProject = async (projectData: ProjectData, ownerId: string) => {
     await runTransaction(db, async (transaction) => {
       const projectDocRef = doc(collection(db, "projects"));
@@ -65,12 +63,10 @@ export const ProjectProvider = ({ children }: ProjectProviderProps) => {
         endDate: dateTimeToTimestamp(projectData.endDate)
       });
 
-      transaction.set(doc(projectDocRef, "team members", ownerId), {
-        role: ROLE.OWNER
-      });
-
-      transaction.update(doc(db, "users", ownerId), {
-        projects: [projectDocRef.id]
+      transaction.set(doc(db, "team members", ownerId + projectDocRef.id), {
+        projectId: projectDocRef.id,
+        role: ROLE.OWNER,
+        userId: ownerId
       });
     });
 

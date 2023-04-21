@@ -37,28 +37,27 @@ export const TeamMemberProvider = ({ children }: TeamMemberProviderProps) => {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const { projects } = useContext(ProjectContext);
 
-  const fetchProjectTeamMembers = async (projectId: string) => {
-    const teamMemberSnapshot = await getDocs(collection(db, "projects", projectId, "team members"));
-
-    return await Promise.all(teamMemberSnapshot.docs.map(async (document) => {
-      const teamMemberData = await getDoc(doc(db, "users", document.id));
-
-      if (!teamMemberData.exists()) throw new Error("Could not retrieve data for user " + document.id);
-
-      return {
-        userId: document.id,
-        projectId: projectId,
-        firstName: teamMemberData.exists() ? teamMemberData.data().firstName : "",
-        lastName: teamMemberData.exists() ? teamMemberData.data().lastName : "",
-        email: teamMemberData.exists() ? teamMemberData.data().email : "",
-        fullName: teamMemberData.exists() ? teamMemberData.data().firstName + " " + teamMemberData.data().lastName : "",
-        role: document.data().role,
-      } as TeamMember;
-    }));
-  }
-
   const fetchTeamMembers = async () => {
-    return (await Promise.all(projects.map(project => fetchProjectTeamMembers(project.id)))).flat();
+    const teamMemberSnapshots = await Promise.all(projects.map(project => getDocs(query(collection(db, "team members"), where("projectId", "==", project.id)))));
+
+    return (await Promise.all(teamMemberSnapshots.map(async (snapshot) => {
+
+      return await Promise.all(snapshot.docs.map(async (teamMemberDocument) => {
+        const userData = await getDoc(doc(db, "users", teamMemberDocument.data().userId));
+
+        if (!userData.exists()) throw new Error("Could not retrieve data for user " + teamMemberDocument.data().userId);
+
+        return {
+          userId: teamMemberDocument.data().userId,
+          projectId: teamMemberDocument.data().projectId,
+          firstName: userData.exists() ? userData.data().firstName : "",
+          lastName: userData.exists() ? userData.data().lastName : "",
+          email: userData.exists() ? userData.data().email : "",
+          fullName: userData.exists() ? userData.data().firstName + " " + userData.data().lastName : "",
+          role: teamMemberDocument.data().role,
+        } as TeamMember;
+      }));
+    }))).flat();
   }
 
   const setTeamMember = async (email: string, projectId: string, role: ROLE) => {
@@ -68,12 +67,10 @@ export const TeamMemberProvider = ({ children }: TeamMemberProviderProps) => {
       throw new Error("No user associated with this email");
     }
 
-    await runTransaction(db, async (transaction) => {
-      transaction.set(doc(db, "projects", projectId, "team members", userSnapshot.docs[0].id), { role });
-
-      if (!userSnapshot.docs[0].data().projects.includes(projectId)) {
-        transaction.update(doc(db, "users", userSnapshot.docs[0].id), { projects: [...userSnapshot.docs[0].data().projects, projectId] });
-      }
+    await setDoc(doc(db, "team members", userSnapshot.docs[0].id + projectId), {
+      projectId: projectId,
+      role: role,
+      userId: userSnapshot.docs[0].id
     });
 
     setTeamMembers(await fetchTeamMembers());

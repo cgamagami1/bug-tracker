@@ -1,4 +1,3 @@
-import { DateTime } from "luxon";
 import TableContainer from "./TableContainer";
 import TableHeader from "./TableHeader";
 import TableRow from "./TableRow";
@@ -6,16 +5,16 @@ import TableData from "./TableData";
 import useTable from "../utils/useTable";
 import { Link } from "react-router-dom";
 import { useContext } from "react";
-import { TicketContext } from "../context/TicketContext";
+import { Ticket } from "../context/TicketContext";
 import { TeamMemberContext } from "../context/TeamMemberContext";
 
 type TicketsTableProps = {
   entriesPerPage?: number;
+  tickets: Ticket[];
 }
 
-const TicketsTable = ({ entriesPerPage = 5 }: TicketsTableProps) => {
+const TicketsTable = ({ entriesPerPage = 5, tickets }: TicketsTableProps) => {
   const { teamMembers } = useContext(TeamMemberContext);
-  const { tickets } = useContext(TicketContext);
 
   const { 
     sortedEntries, 
@@ -26,7 +25,7 @@ const TicketsTable = ({ entriesPerPage = 5 }: TicketsTableProps) => {
     firstShownPageButton,
     footerInfo
   } = useTable(tickets, entriesPerPage);
-
+  
   return (
     <TableContainer title="Tickets" currentPage={currentPage} handleOnNewPage={handleOnNewPage} firstShownPageButton={firstShownPageButton} footerInfo={footerInfo}>
       <table>
@@ -36,7 +35,7 @@ const TicketsTable = ({ entriesPerPage = 5 }: TicketsTableProps) => {
             <TableHeader title="Submitter" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute="submitterId" hideOnMobile />
             <TableHeader title="Developer" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute="developerId" hideOnMobile />
             <TableHeader title="Status" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute="status" />
-            <TableHeader title="Priority" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute="priority" />
+            <TableHeader title="Priority" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute="priority" hideOnMobile />
             <TableHeader title="Date Created" sortAlgorithm={sortAlgorithm} setSortAlgorithm={setSortAlgorithm} headerAttribute="dateCreated" hideOnMobile />
           </tr>
         </thead>
@@ -46,8 +45,8 @@ const TicketsTable = ({ entriesPerPage = 5 }: TicketsTableProps) => {
             sortedEntries.map(ticket => (
               <TableRow key={ticket.id}>
                 <TableData>{ ticket.title }</TableData>
-                <TableData hideOnMobile>REPLACE</TableData>
-                <TableData hideOnMobile>REPLACE</TableData>
+                <TableData hideOnMobile>{ teamMembers.find(teamMember => teamMember.userId === ticket.submitterId)?.fullName }</TableData>
+                <TableData hideOnMobile>{ teamMembers.find(teamMember => teamMember.userId === ticket.developerId)?.fullName }</TableData>
                 <TableData>{ ticket.status }</TableData>
                 <TableData hideOnMobile>{ ticket.priority }</TableData>
                 <TableData hideOnMobile>{ ticket.dateCreated.toISODate() }</TableData>

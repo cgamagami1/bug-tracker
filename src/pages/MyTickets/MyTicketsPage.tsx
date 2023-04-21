@@ -3,9 +3,11 @@ import TicketsTable from "../../components/TicketsTable";
 import Button, { BUTTON_STYLES } from "../../components/Button";
 import { useContext } from "react";
 import { ProjectContext } from "../../context/ProjectContext";
+import { TicketContext } from "../../context/TicketContext";
 
 const MyTicketsPage = () => {
   const { projects } = useContext(ProjectContext);
+  const { myTickets } = useContext(TicketContext);
 
   return (
     <div>
@@ -18,7 +20,7 @@ const MyTicketsPage = () => {
         </Link> }
       </div>
 
-      <TicketsTable entriesPerPage={15} />
+      <TicketsTable entriesPerPage={15} tickets={myTickets} />
     </div>
   );
 }

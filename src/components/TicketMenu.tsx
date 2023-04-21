@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ProjectContext } from "../context/ProjectContext";
 import { TeamMember, TeamMemberContext } from "../context/TeamMemberContext";
 import { ROLE } from "../context/TeamMemberContext";
-import { addDoc, collection, serverTimestamp, updateDoc, doc } from "firebase/firestore";
+import { addDoc, collection, serverTimestamp, updateDoc, doc, deleteDoc } from "firebase/firestore";
 import { db } from "../utils/firebase-config";
 import { UserContext } from "../context/UserContext";
 
@@ -84,6 +84,14 @@ const TicketMenu = ({ editedItem }: TicketMenuProps) => {
     setIsLoading(false);
   }
 
+  const handleOnDelete = async () => {
+    if (!editedItem) return;
+
+    await deleteDoc(doc(db, "tickets", editedItem.id));
+
+    navigate(`/tickets`)
+  }
+
   const handleOnChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setFormFields({ ...formFields, [e.target.id]: e.target.value });
   const handleOnProjectChange = (e: ChangeEvent<HTMLSelectElement>) => setFormFields({ 
     ...formFields, 
@@ -150,9 +158,13 @@ const TicketMenu = ({ editedItem }: TicketMenuProps) => {
            <div className="flex gap-4">
             <Button title="Save" type="submit" isLoading={isLoading} />
 
-             <Link to={editedItem ? ".." : "/tickets"} relative="path">
+            <Link to={editedItem ? ".." : "/tickets"} relative="path">
               <Button title="Cancel" style={BUTTON_STYLES.GRAY} />
             </Link>
+          </div>
+
+          <div className="ml-auto">
+            {editedItem && <Button title="Delete Ticket" style={BUTTON_STYLES.RED} handleOnClick={handleOnDelete} />}
           </div>
 
          </form>

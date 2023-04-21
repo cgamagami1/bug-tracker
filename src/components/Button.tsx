@@ -16,6 +16,10 @@ export const BUTTON_STYLES = {
   ADD_ITEM: {
     styles: "bg-purple-500 text-white py-1 px-2",
     hoverStyles: "hover:bg-purple-600",
+  },
+  RED: {
+    styles: "bg-red-500 text-white w-40 h-9",
+    hoverStyles: "hover:bg-red-600"
   }
 }
 

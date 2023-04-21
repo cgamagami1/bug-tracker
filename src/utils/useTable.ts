@@ -28,8 +28,8 @@ const newSortAlgorithm = <T>(sortAlgorithm: SortAlgorithm<T>) => {
   };
 }
 
-const useTable = <T extends {}>(entries: T[], entriesPerPage = 5) => {
-  const [sortAlgorithm, setSortAlgorithm] = useState<SortAlgorithm<T>>({ attribute: null, isReversed: false });
+const useTable = <T extends {}>(entries: T[], entriesPerPage = 5, defaultSortAlgorithm: SortAlgorithm<T> = { attribute: null, isReversed: false } ) => {
+  const [sortAlgorithm, setSortAlgorithm] = useState<SortAlgorithm<T>>(defaultSortAlgorithm);
   const [currentPage, setCurrentPage] = useState(0);
   const firstShownEntry = currentPage * entriesPerPage;
   const lastPage = Math.ceil(entries.length / entriesPerPage) - 1;

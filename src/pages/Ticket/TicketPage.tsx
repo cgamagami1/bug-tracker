@@ -39,7 +39,7 @@ const TicketPage = () => {
         <TicketHistoryTable />
       </PageRow>
       <PageRow>
-        <CommentsTable />
+        <CommentsTable ticketId={ticket.id} />
       </PageRow>
     </div>
   );

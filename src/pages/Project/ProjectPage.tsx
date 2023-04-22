@@ -4,38 +4,15 @@ import TicketsTable from "../../components/TicketsTable";
 import DetailsCard from "../../components/DetailsCard";
 import DetailsCardItem from "../../components/DetailsCardItem";
 import PageRow from "../../components/PageRow";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { ProjectContext } from "../../context/ProjectContext";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "../../utils/firebase-config";
-import { Ticket } from "../../context/TicketContext";
-import { timestampToDateTime } from "../../utils/date-conversion";
+import { TicketContext } from "../../context/TicketContext";
 
 const ProjectPage = () => {
   const { projectId } = useParams();
   const { projects } = useContext(ProjectContext);
+  const { tickets } = useContext(TicketContext);
   const project = projects.find(project => project.id === projectId);
-  const [tickets, setTickets] = useState<Ticket[]>([]);
-
-  useEffect(() => {
-    const getTickets = async () => {
-      if (!project) return;
-
-      const ticketSnapshot = await getDocs(query(collection(db, "tickets"), where("projectId", "==", project.id)));
-
-      const ticketList = ticketSnapshot.docs.map(document => {
-        return {
-          ...document.data(),
-          id: document.id,
-          dateCreated: timestampToDateTime(document.data().dateCreated),
-        } as Ticket;
-      })
-
-      setTickets(ticketList);
-    }
-
-    getTickets();
-  }, [project]);
   
   if (!project) return <></>;
   

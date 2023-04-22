@@ -7,7 +7,7 @@ import { TicketContext } from "../../context/TicketContext";
 
 const MyTicketsPage = () => {
   const { projects } = useContext(ProjectContext);
-  const { myTickets } = useContext(TicketContext);
+  const { tickets } = useContext(TicketContext);
 
   return (
     <div>
@@ -20,7 +20,7 @@ const MyTicketsPage = () => {
         </Link> }
       </div>
 
-      <TicketsTable entriesPerPage={15} tickets={myTickets} />
+      <TicketsTable entriesPerPage={15} tickets={tickets} />
     </div>
   );
 }

@@ -1,9 +1,10 @@
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { DateTime } from "luxon";
 import { UserContext } from "./UserContext";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where, deleteDoc, doc, addDoc, updateDoc, serverTimestamp, runTransaction } from "firebase/firestore";
 import { timestampToDateTime } from "../utils/date-conversion";
 import { db } from "../utils/firebase-config";
+import { ProjectContext } from "./ProjectContext";
 
 export enum STATUS {
   OPEN = "Open",
@@ -17,21 +18,27 @@ export enum PRIORITY {
   HIGH = "High"
 }
 
-export type Ticket = {
-  id: string;
+export type TicketMenuData = {
   title: string;
   description: string;
   submitterId: string;
   developerId: string;
   projectId: string;
   type: "Bug" | 'UI';
-  status: STATUS;
   priority: PRIORITY;
-  dateCreated: DateTime;
 }
 
+export type Ticket = { 
+  id: string; 
+  status: STATUS;
+  dateCreated: DateTime;
+} & TicketMenuData;
+
 type TicketContextValue = {
-  myTickets: Ticket[];
+  tickets: Ticket[];
+  addTicket: (ticketData: TicketMenuData) => void;
+  updateTicket: (ticketId: string, ticketData: TicketMenuData) => void;
+  deleteTicket: (ticket: Ticket) => void;
 }
 
 export const TicketContext = createContext({} as TicketContextValue);
@@ -42,32 +49,80 @@ type TicketProviderProps = {
 
 export const TicketProvider = ({ children }: TicketProviderProps) => {
   const { user } = useContext(UserContext);
-  const [myTickets, setMyTickets] = useState<Ticket[]>([]);
+  const { projects } = useContext(ProjectContext);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
 
-  const fetchMyTickets = async () => {
-    // for each project, fetch all tickets if admin/owner/manager, fetch only relevant tickets if developer/submitter
+  const fetchTickets = async () => {
     if (!user) return []; 
-    const myTicketsSnapshot = await getDocs(query(collection(db, "tickets"), where("developerId", "==", user?.uid)));
 
-    return myTicketsSnapshot.docs.map(document => {
-      return {
-        ...document.data(),
-        id: document.id,
-        dateCreated: timestampToDateTime(document.data().dateCreated),
-      } as Ticket;
+    const ticketSnapshots = await Promise.all(projects.map(project => getDocs(query(collection(db, "tickets"), where("projectId", "==", project.id)))));
+    console.log(ticketSnapshots)
+    return ticketSnapshots.map(snapshot => {
+      return snapshot.docs.map(document => {
+        return {
+          ...document.data(),
+          id: document.id,
+          dateCreated: timestampToDateTime(document.data().dateCreated),
+        } as Ticket;
+      });
+    }).flat();
+  }
+
+  const addTicket = async (ticketData: TicketMenuData) => {
+    await addDoc(collection(db, "tickets"), {
+      ...ticketData,
+      status: STATUS.OPEN,
+      dateCreated: serverTimestamp()
     });
+
+    setTickets(await fetchTickets());
+  }
+
+  const updateTicket = async (ticketId: string, ticketData: TicketMenuData) => {
+    const ticket = tickets.find(ticket => ticket.id === ticketId);
+
+    if (!ticket) throw new Error("Could not find ticket");
+
+    await runTransaction(db, async (transaction) => {
+      transaction.update(doc(db, "tickets", ticketId), ticketData);
+
+      for (const key of Object.keys(ticketData)) {
+        const newValue = ticketData[key as keyof TicketMenuData];
+        const oldValue = ticket[key as keyof TicketMenuData];
+
+        if (oldValue !== newValue) {
+          transaction.set(doc(collection(db, "tickets", ticketId, "ticket edits")), {
+            property: key,
+            oldValue,
+            newValue,
+            dateChanged: serverTimestamp()
+          });
+        }
+      }
+    })
+
+    setTickets(await fetchTickets());
+  }
+
+  const deleteTicket = async (ticket: Ticket) => {
+    await deleteDoc(doc(db, "tickets", ticket.id));
+
+    setTickets(await fetchTickets());
   }
 
   useEffect(() => {
     const getMyTickets = async () => {
-      setMyTickets(await fetchMyTickets());
+      setTickets(await fetchTickets());
     }
 
     getMyTickets();
-  }, [user]);
+  }, [projects]);
 
   const value = {
-    myTickets
+    tickets,
+    addTicket,
+    updateTicket,
+    deleteTicket
   };
 
   return (

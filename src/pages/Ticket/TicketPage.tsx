@@ -4,20 +4,17 @@ import PageRow from "../../components/PageRow";
 import { Link, useParams } from "react-router-dom";
 import TicketHistoryTable from "./TicketHistoryTable";
 import CommentsTable from "./CommentsTable";
-import { useContext, useEffect, useState } from "react";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../utils/firebase-config";
-import { Ticket } from "../../context/TicketContext";
-import { timestampToDateTime } from "../../utils/date-conversion";
+import { useContext } from "react";
 import { ProjectContext } from "../../context/ProjectContext";
 import { TeamMemberContext } from "../../context/TeamMemberContext";
-import useGetTicket from "../../utils/useGetTicket";
+import { TicketContext } from "../../context/TicketContext";
 
 const TicketPage = () => {
   const { ticketId } = useParams();
   const { projects } = useContext(ProjectContext);
   const { teamMembers } = useContext(TeamMemberContext);
-  const ticket = useGetTicket(ticketId);
+  const { tickets } = useContext(TicketContext);
+  const ticket = tickets.find(ticket => ticket.id === ticketId);
   const project = projects.find(project => project.id === ticket?.projectId);
 
   if (!ticket || !project) return <></>;
@@ -36,7 +33,7 @@ const TicketPage = () => {
           <DetailsCardItem name="Type" value={ticket.type} />
           <DetailsCardItem name="Date Created" value={ticket.dateCreated.toISODate()} />
         </DetailsCard>
-        <TicketHistoryTable />
+        <TicketHistoryTable ticketId={ticket.id} />
       </PageRow>
       <PageRow>
         <CommentsTable ticketId={ticket.id} />

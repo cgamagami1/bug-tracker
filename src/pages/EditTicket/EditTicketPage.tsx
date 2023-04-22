@@ -1,13 +1,14 @@
-import { FormEvent, useContext } from "react";
+import { useContext } from "react";
 import { Link, useParams } from "react-router-dom";
 import TicketMenu from "../../components/TicketMenu";
-import useGetTicket from "../../utils/useGetTicket";
 import { ProjectContext } from "../../context/ProjectContext";
+import { TicketContext } from "../../context/TicketContext";
 
 const EditTicketPage = () => {
   const { ticketId } = useParams();
   const { projects } = useContext(ProjectContext);
-  const ticket = useGetTicket(ticketId);
+  const { tickets } = useContext(TicketContext);
+  const ticket = tickets.find(ticket => ticket.id === ticketId);
   const project = projects.find(project => project.id === ticket?.projectId);
 
   if (!ticket || !project) return <></>;

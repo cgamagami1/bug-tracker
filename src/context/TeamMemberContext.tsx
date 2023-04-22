@@ -2,6 +2,7 @@ import { ReactNode, createContext, useContext, useEffect, useState } from "react
 import { setDoc, collection, getDocs, doc, deleteDoc, getDoc, query, where, runTransaction } from "firebase/firestore";
 import { db } from "../utils/firebase-config";
 import { ProjectContext } from "./ProjectContext";
+import { UserContext } from "./UserContext";
 
 export enum ROLE {
   OWNER = "Owner",
@@ -25,6 +26,7 @@ type TeamMemberContextValue = {
   teamMembers: TeamMember[];
   setTeamMember: (teamMemberEmail: string, projectId: string, role: ROLE) => Promise<void>;
   removeTeamMember: (teamMember: TeamMember) => Promise<void>;
+  userHasRole: (projectId: string, role: ROLE | ROLE[]) => boolean;
 }
 
 export const TeamMemberContext = createContext({} as TeamMemberContextValue);
@@ -35,7 +37,27 @@ type TeamMemberProviderProps = {
 
 export const TeamMemberProvider = ({ children }: TeamMemberProviderProps) => {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const { user } = useContext(UserContext);
   const { projects } = useContext(ProjectContext);
+
+  const userHasRole = (projectId: string, role: ROLE | ROLE[]) => {
+    if (!user) return false;
+
+    const userTeamMember = teamMembers.find(teamMember => teamMember.userId === user.uid && teamMember.projectId === projectId);
+
+    if (!userTeamMember) return false;
+
+    if (role instanceof Array) {
+      for (const r of role) {
+        if (r === userTeamMember.role) return true;
+      }
+      
+      return false;
+    }
+    else {
+      return userTeamMember.role === role;
+    }
+  }
 
   const fetchTeamMembers = async () => {
     const teamMemberSnapshots = await Promise.all(projects.map(project => getDocs(query(collection(db, "team members"), where("projectId", "==", project.id)))));
@@ -103,7 +125,8 @@ export const TeamMemberProvider = ({ children }: TeamMemberProviderProps) => {
   const value = {
     teamMembers,
     setTeamMember,
-    removeTeamMember
+    removeTeamMember,
+    userHasRole
   }
 
   return (

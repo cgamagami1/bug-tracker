@@ -4,54 +4,59 @@ import useTable from "../../utils/useTable";
 import TableHeader from "../../components/TableHeader";
 import TableRow from "../../components/TableRow";
 import TableData from "../../components/TableData";
+import { useContext, useEffect, useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../utils/firebase-config";
+import { timestampToDateTime } from "../../utils/date-conversion";
+import { TicketMenuData } from "../../context/TicketContext";
+import { TeamMemberContext } from "../../context/TeamMemberContext";
 
-export type TicketEdits<T> = {
-  id: number;
+const propertyTitle = (property: string) => {
+  switch (property) {
+    case "developerId":
+      return "Developer";
+    default:
+      return property.charAt(0).toUpperCase() + property.slice(1);
+  }
+}
+
+export type TicketEdit<T> = {
+  id: string;
   property: string;
   oldValue: T;
   newValue: T;
   dateChanged: DateTime;
 }
 
-const TicketHistoryTable = () => {
-  const ticketEdit = [
-    {
-      id: 0,
-      property: "title",
-      oldValue: "Do This",
-      newValue: "Do That",
-      dateChanged: DateTime.now()
-    },
-    {
-      id: 1,
-      property: "title",
-      oldValue: "Do This",
-      newValue: "Do That",
-      dateChanged: DateTime.now()
-    },
-    {
-      id: 2,
-      property: "title",
-      oldValue: "Do This",
-      newValue: "Do That",
-      dateChanged: DateTime.now()
-    },
-    {
-      id: 3,
-      property: "title",
-      oldValue: "Do This",
-      newValue: "Do That",
-      dateChanged: DateTime.now()
-    },
-    {
-      id: 4,
-      property: "title",
-      oldValue: "Do This",
-      newValue: "Do That",
-      dateChanged: DateTime.now()
-    },
-    
-  ];
+type TicketHistoryTableProps = {
+  ticketId: string;
+}
+
+const TicketHistoryTable = ({ ticketId }: TicketHistoryTableProps) => {
+  const [ticketEdits, setTicketEdits] = useState<TicketEdit<TicketMenuData[keyof TicketMenuData]>[]>([]);
+  const { teamMembers } = useContext(TeamMemberContext);
+
+  useEffect(() => {
+    const getTicketEdits = async () => {
+      const ticketEditSnapshot = await getDocs(collection(db, "tickets", ticketId, "ticket edits"));
+
+      const ticketEditList = ticketEditSnapshot.docs.map(document => {
+        const docData = document.data();
+
+        return {
+          id: document.id,
+          property: docData.property,
+          oldValue: docData.oldValue,
+          newValue: docData.newValue,
+          dateChanged: timestampToDateTime(docData.dateChanged)
+        } as TicketEdit<typeof docData.newValue>;
+      });
+
+      setTicketEdits(ticketEditList);
+    }
+
+    getTicketEdits();
+  }, []);
 
   const {
     sortedEntries,
@@ -61,7 +66,7 @@ const TicketHistoryTable = () => {
     handleOnNewPage,
     firstShownPageButton,
     footerInfo
-  } = useTable(ticketEdit);
+  } = useTable(ticketEdits, 5, { attribute: "dateChanged", isReversed: true });
 
   return (
     <TableContainer title="Ticket History" currentPage={currentPage} handleOnNewPage={handleOnNewPage} firstShownPageButton={firstShownPageButton} footerInfo={footerInfo} hideOnMobile>
@@ -79,9 +84,9 @@ const TicketHistoryTable = () => {
           {
             sortedEntries.map(ticketEdit => (
               <TableRow key={ticketEdit.id}>
-                <TableData>{ ticketEdit.property }</TableData>
-                <TableData>{ ticketEdit.oldValue }</TableData>
-                <TableData>{ ticketEdit.newValue }</TableData>
+                <TableData>{ propertyTitle(ticketEdit.property) }</TableData>
+                <TableData>{ ticketEdit.property === "developerId" ? teamMembers.find(teamMember => teamMember.userId === ticketEdit.oldValue)?.fullName : ticketEdit.oldValue }</TableData>
+                <TableData>{ ticketEdit.property === "developerId" ? teamMembers.find(teamMember => teamMember.userId === ticketEdit.newValue)?.fullName : ticketEdit.newValue }</TableData>
                 <TableData>{ ticketEdit.dateChanged.toISODate() }</TableData>
               </TableRow>
             ))

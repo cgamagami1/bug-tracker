@@ -1,11 +1,11 @@
 import { ChangeEvent, FormEvent, useContext, useState } from "react";
-import { Ticket, PRIORITY, STATUS } from "../context/TicketContext";
+import { Ticket, PRIORITY, TicketContext } from "../context/TicketContext";
 import Button, { BUTTON_STYLES } from "./Button";
 import { Link, useNavigate } from "react-router-dom";
 import { ProjectContext } from "../context/ProjectContext";
 import { TeamMember, TeamMemberContext } from "../context/TeamMemberContext";
 import { ROLE } from "../context/TeamMemberContext";
-import { addDoc, collection, serverTimestamp, updateDoc, doc, deleteDoc } from "firebase/firestore";
+import { serverTimestamp } from "firebase/firestore";
 import { db } from "../utils/firebase-config";
 import { UserContext } from "../context/UserContext";
 
@@ -30,6 +30,7 @@ const TicketMenu = ({ editedItem }: TicketMenuProps) => {
   const { user } = useContext(UserContext);
   const { projects } = useContext(ProjectContext);
   const { teamMembers } = useContext(TeamMemberContext);
+  const { addTicket, updateTicket, deleteTicket } = useContext(TicketContext);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const developers = getDevelopers(teamMembers, projects[0]?.id);
@@ -48,33 +49,34 @@ const TicketMenu = ({ editedItem }: TicketMenuProps) => {
     e.preventDefault();
     setIsLoading(true);
 
+    if (!user) throw new Error("No user authenticated");
+
     if (!formFields.title || !formFields.developerId || !formFields.type || !formFields.priority || !formFields.projectId) {
       setErrorMessage("One or more required fields missing");
     }
     else {
       const ticketData = {
-        title: formFields.title,
-        description: formFields.description,
-        developerId: formFields.developerId,
-        submitterId: user?.uid,
-        projectId: formFields.projectId,
-        priority: formFields.priority,
-        type: formFields.type
+        ...formFields,
+        submitterId: user.uid,
       }
 
       try {
         if (!editedItem) {
-          await addDoc(collection(db, "tickets"), {
-            ...ticketData,
-            status: STATUS.OPEN,
-            dateCreated: serverTimestamp()
+          await addTicket({
+            ...formFields,
+            submitterId: user.uid
           });
+
+          navigate("/tickets");
         }
         else {
-          await updateDoc(doc(db, "tickets", editedItem.id), ticketData);
-        }
+          await updateTicket(editedItem.id, {
+            ...formFields,
+            submitterId: editedItem.submitterId
+          });
 
-        navigate("/tickets");
+          navigate(`/tickets/${editedItem.id}`);
+        }
       }
       catch (error) {
         if (error instanceof Error) setErrorMessage("An error has occured: " + error.message);
@@ -87,7 +89,7 @@ const TicketMenu = ({ editedItem }: TicketMenuProps) => {
   const handleOnDelete = async () => {
     if (!editedItem) return;
 
-    await deleteDoc(doc(db, "tickets", editedItem.id));
+    await deleteTicket(editedItem);
 
     navigate(`/tickets`)
   }

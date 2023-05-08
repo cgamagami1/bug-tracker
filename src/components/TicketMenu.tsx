@@ -5,8 +5,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { ProjectContext } from "../context/ProjectContext";
 import { TeamMember, TeamMemberContext } from "../context/TeamMemberContext";
 import { ROLE } from "../context/TeamMemberContext";
-import { serverTimestamp } from "firebase/firestore";
-import { db } from "../utils/firebase-config";
 import { UserContext } from "../context/UserContext";
 
 type FormFields = {
@@ -29,19 +27,20 @@ const getDevelopers = (teamMembers: TeamMember[], projectId: string) => {
 const TicketMenu = ({ editedItem }: TicketMenuProps) => {
   const { user } = useContext(UserContext);
   const { projects } = useContext(ProjectContext);
-  const { teamMembers } = useContext(TeamMemberContext);
+  const { teamMembers, hasRole } = useContext(TeamMemberContext);
   const { addTicket, updateTicket, deleteTicket } = useContext(TicketContext);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const developers = getDevelopers(teamMembers, projects[0]?.id);
+  const submitterProjects = projects.filter(project => hasRole(project.id, [ROLE.SUBMITTER, ROLE.PROJECT_ADMIN, ROLE.OWNER]));
+  const developers = getDevelopers(teamMembers, submitterProjects[0]?.id);
   const navigate = useNavigate();
   
   const [formFields, setFormFields] = useState<FormFields>({
     title: editedItem?.title ?? "",
-    developerId: editedItem?.developerId ?? developers[0]?.userId ?? "",
+    developerId: editedItem?.developerId ?? developers[0]?.userId,
     type: editedItem?.type ?? "Bug",
     priority: editedItem?.priority ?? PRIORITY.LOW,
-    projectId: editedItem?.projectId ?? projects[0].id,
+    projectId: editedItem?.projectId ?? submitterProjects[0]?.id,
     description: editedItem?.description ?? ""
   });
 
@@ -55,11 +54,6 @@ const TicketMenu = ({ editedItem }: TicketMenuProps) => {
       setErrorMessage("One or more required fields missing");
     }
     else {
-      const ticketData = {
-        ...formFields,
-        submitterId: user.uid,
-      }
-
       try {
         if (!editedItem) {
           await addTicket({
@@ -112,7 +106,7 @@ const TicketMenu = ({ editedItem }: TicketMenuProps) => {
              <input className="focus:outline-none border rounded-md h-9 px-2" type="text" id="title" value={formFields.title} onChange={handleOnChange} />
           </div>
 
-           <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1">
             <label className="font-bold" htmlFor="developerId">Developer</label>
 
              <select className="focus:outline-none border rounded-md h-9 px-2" id="developerId" value={formFields.developerId} onChange={handleOnChange}>
@@ -145,7 +139,7 @@ const TicketMenu = ({ editedItem }: TicketMenuProps) => {
             <label className="font-bold" htmlFor="projectId">Project</label>
 
              <select className="focus:outline-none border rounded-md h-9 px-2" id="projectId" value={formFields.projectId} onChange={handleOnProjectChange}>
-              { projects.map(project => (
+              { submitterProjects.map(project => (
                 <option key={project.id} value={project.id}>{ project.title }</option>
               )) }
             </select>

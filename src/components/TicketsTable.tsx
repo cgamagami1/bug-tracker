@@ -14,7 +14,7 @@ type TicketsTableProps = {
 }
 
 const TicketsTable = ({ entriesPerPage = 5, tickets }: TicketsTableProps) => {
-  const { teamMembers } = useContext(TeamMemberContext);
+  const { getTeamMemberName } = useContext(TeamMemberContext);
 
   const { 
     sortedEntries, 
@@ -45,8 +45,8 @@ const TicketsTable = ({ entriesPerPage = 5, tickets }: TicketsTableProps) => {
             sortedEntries.map(ticket => (
               <TableRow key={ticket.id}>
                 <TableData>{ ticket.title }</TableData>
-                <TableData hideOnMobile>{ teamMembers.find(teamMember => teamMember.userId === ticket.submitterId)?.fullName }</TableData>
-                <TableData hideOnMobile>{ teamMembers.find(teamMember => teamMember.userId === ticket.developerId)?.fullName }</TableData>
+                <TableData hideOnMobile>{ getTeamMemberName(ticket.submitterId) }</TableData>
+                <TableData hideOnMobile>{ getTeamMemberName(ticket.developerId) }</TableData>
                 <TableData>{ ticket.status }</TableData>
                 <TableData hideOnMobile>{ ticket.priority }</TableData>
                 <TableData hideOnMobile>{ ticket.dateCreated.toISODate() }</TableData>

@@ -3,8 +3,8 @@ import TableHeader from "../../components/TableHeader";
 import useTable from "../../utils/useTable";
 import TableRow from "../../components/TableRow";
 import TableData from "../../components/TableData";
-import { useContext } from "react";
-import { TeamMemberContext } from "../../context/TeamMemberContext";
+import { ChangeEvent, useContext } from "react";
+import { ROLE, TeamMemberContext } from "../../context/TeamMemberContext";
 import AddTeamMemberCard from "./AddTeamMemberCard";
 
 type TeamMemberTableProps = {
@@ -12,7 +12,7 @@ type TeamMemberTableProps = {
 }
 
 const TeamMemberTable = ({ projectId }: TeamMemberTableProps) => {
-  const { teamMembers, removeTeamMember } = useContext(TeamMemberContext);
+  const { teamMembers, removeTeamMember, hasRole } = useContext(TeamMemberContext);
   const projectTeamMembers = teamMembers.filter(teamMember => teamMember.projectId === projectId);
 
   const { 
@@ -44,7 +44,8 @@ const TeamMemberTable = ({ projectId }: TeamMemberTableProps) => {
                 <TableData>{ teamMember.email }</TableData>
                 <TableData>{ teamMember.role }</TableData>
                 <TableData>
-                  <span className="text-purple-600 underline hover:cursor-pointer" onClick={() => removeTeamMember(teamMember)}>Remove</span>
+                  {(hasRole(projectId, [ROLE.PROJECT_ADMIN, ROLE.OWNER]) && teamMember.role !== ROLE.OWNER) && 
+                    <span className="text-purple-600 underline hover:cursor-pointer" onClick={() => removeTeamMember(teamMember)}>Remove</span>}
                 </TableData>
               </TableRow>
             ))

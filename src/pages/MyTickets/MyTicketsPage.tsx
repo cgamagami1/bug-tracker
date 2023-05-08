@@ -4,17 +4,20 @@ import Button, { BUTTON_STYLES } from "../../components/Button";
 import { useContext } from "react";
 import { ProjectContext } from "../../context/ProjectContext";
 import { TicketContext } from "../../context/TicketContext";
+import { TeamMemberContext, ROLE } from "../../context/TeamMemberContext";
 
 const MyTicketsPage = () => {
   const { projects } = useContext(ProjectContext);
   const { tickets } = useContext(TicketContext);
+  const { hasRole } = useContext(TeamMemberContext);
+  const submitterProjects = projects.filter(project => hasRole(project.id, [ROLE.SUBMITTER, ROLE.PROJECT_ADMIN, ROLE.OWNER]));
 
   return (
     <div>
       <div className="flex justify-between items-start">
         <h2 className="text-xl mb-6"><Link to="/tickets">My Tickets</Link></h2>
 
-        { projects.length > 0 && 
+        { submitterProjects.length > 0 && 
         <Link to="/newticket">
           <Button title="Add Ticket" style={BUTTON_STYLES.ADD_ITEM} />
         </Link> }

@@ -4,6 +4,7 @@ import { DateTime } from "luxon";
 import { UserContext } from "../context/UserContext";
 import { Project, ProjectContext } from "../context/ProjectContext";
 import Button, { BUTTON_STYLES } from "./Button";
+import { TeamMemberContext, ROLE } from "../context/TeamMemberContext";
 
 type FormFields = {
   title: string;
@@ -26,7 +27,8 @@ const ProjectMenu = ({ editedItem }: ProjectMenuProps) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useContext(UserContext);
-  const { addProject, updateProject } = useContext(ProjectContext);
+  const { addProject, updateProject, deleteProject } = useContext(ProjectContext);
+  const { hasRole } = useContext(TeamMemberContext);
   const navigate = useNavigate();
 
   if (!user) return <></>;
@@ -52,6 +54,14 @@ const ProjectMenu = ({ editedItem }: ProjectMenuProps) => {
     }
 
     setIsLoading(false);
+  }
+
+  const handleOnDelete = async () => {
+    if (!editedItem) return;
+
+    await deleteProject(editedItem);
+    
+    navigate("/projects");
   }
   
   const handleOnChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setFormFields({ ...formFields, [e.target.id]: e.target.value });
@@ -88,6 +98,10 @@ const ProjectMenu = ({ editedItem }: ProjectMenuProps) => {
             <Link to={editedItem ? ".." : "/projects"} relative="path">
               <Button title="Cancel" style={BUTTON_STYLES.GRAY} />
             </Link>
+
+            <div className="ml-auto">
+              {(editedItem && hasRole(editedItem.id, ROLE.OWNER)) && <Button title="Delete Project" style={BUTTON_STYLES.RED} handleOnClick={handleOnDelete} />}
+            </div>
           </div>
         </form>
       </div>

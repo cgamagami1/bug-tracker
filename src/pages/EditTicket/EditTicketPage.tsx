@@ -3,15 +3,17 @@ import { Link, useParams } from "react-router-dom";
 import TicketMenu from "../../components/TicketMenu";
 import { ProjectContext } from "../../context/ProjectContext";
 import { TicketContext } from "../../context/TicketContext";
+import { ROLE, TeamMemberContext } from "../../context/TeamMemberContext";
 
 const EditTicketPage = () => {
   const { ticketId } = useParams();
   const { projects } = useContext(ProjectContext);
   const { tickets } = useContext(TicketContext);
+  const { hasRole } = useContext(TeamMemberContext);
   const ticket = tickets.find(ticket => ticket.id === ticketId);
   const project = projects.find(project => project.id === ticket?.projectId);
 
-  if (!ticket || !project) return <></>;
+  if (!ticket || !project || !hasRole(ticket.projectId, [ROLE.SUBMITTER, ROLE.PROJECT_ADMIN, ROLE.OWNER])) return <></>;
 
   return (
     <div>

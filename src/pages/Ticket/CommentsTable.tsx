@@ -23,7 +23,7 @@ type CommentTableProps = {
 
 const CommentsTable = ({ ticketId }: CommentTableProps) => {
   const [comments, setComments] = useState<Comment[]>([]);
-  const { teamMembers } = useContext(TeamMemberContext);
+  const { getTeamMemberName } = useContext(TeamMemberContext);
   const { user } = useContext(UserContext);
   const [newComment, setNewComment] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -96,7 +96,7 @@ const CommentsTable = ({ ticketId }: CommentTableProps) => {
             <img className="rounded-full w-10" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" alt="profile picture" />
 
             <div className="flex-grow">
-              <p><span className="font-bold">{ teamMembers.find(teamMember => teamMember.userId === comment.posterId)?.fullName }</span> { comment.datePosted?.toISODate() }</p>
+              <p><span className="font-bold">{ getTeamMemberName(comment.posterId) }</span> { comment.datePosted?.toISODate() }</p>
               <p className="inline-block">{ comment.message }</p>
             </div>
 

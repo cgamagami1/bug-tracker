@@ -7,11 +7,13 @@ import PageRow from "../../components/PageRow";
 import { useContext } from "react";
 import { ProjectContext } from "../../context/ProjectContext";
 import { TicketContext } from "../../context/TicketContext";
+import { TeamMemberContext, ROLE } from "../../context/TeamMemberContext";
 
 const ProjectPage = () => {
   const { projectId } = useParams();
   const { projects } = useContext(ProjectContext);
   const { tickets } = useContext(TicketContext);
+  const { hasRole } = useContext(TeamMemberContext);
   const project = projects.find(project => project.id === projectId);
   
   if (!project) return <></>;
@@ -21,7 +23,7 @@ const ProjectPage = () => {
       <h2 className="text-xl mb-6"><Link to="/projects">My Projects</Link> &gt; <Link to={`/projects/${projectId}`}>{ project.title }</Link></h2>
 
       <PageRow>
-        <DetailsCard title={project.title}>
+        <DetailsCard title={project.title} canEdit={hasRole(project.id, [ROLE.PROJECT_ADMIN, ROLE.OWNER])}>
           {project.description && <DetailsCardItem name="Description" value={project.description} spanTwoColumns />}
           {project.startDate && <DetailsCardItem name="Start Date" value={project.startDate.toISODate()} />}
           {project.endDate && <DetailsCardItem name="End Date" value={project.endDate.toISODate()} />}

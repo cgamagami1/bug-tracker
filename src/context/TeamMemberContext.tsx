@@ -1,18 +1,18 @@
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
-import { setDoc, collection, getDocs, doc, deleteDoc, getDoc, query, where, runTransaction } from "firebase/firestore";
+import { setDoc, collection, getDocs, doc, getDoc, query, where, runTransaction } from "firebase/firestore";
 import { db } from "../utils/firebase-config";
 import { ProjectContext } from "./ProjectContext";
 import { UserContext } from "./UserContext";
 
 export enum ROLE {
   OWNER = "Owner",
-  ADMIN = "Admin",
-  PROJECT_MANAGER = "Project Manager",
+  PROJECT_ADMIN = "Project Admin",
   SUBMITTER = "Submitter",
   DEVELOPER = "Developer"
 }
 
 export type TeamMember = {
+  id: string;
   userId: string;
   projectId: string;
   firstName: string;
@@ -26,7 +26,8 @@ type TeamMemberContextValue = {
   teamMembers: TeamMember[];
   setTeamMember: (teamMemberEmail: string, projectId: string, role: ROLE) => Promise<void>;
   removeTeamMember: (teamMember: TeamMember) => Promise<void>;
-  userHasRole: (projectId: string, role: ROLE | ROLE[]) => boolean;
+  hasRole: (projectId: string, role: ROLE | ROLE[]) => boolean;
+  getTeamMemberName: (teamMemberId: string) => string;
 }
 
 export const TeamMemberContext = createContext({} as TeamMemberContextValue);
@@ -40,7 +41,7 @@ export const TeamMemberProvider = ({ children }: TeamMemberProviderProps) => {
   const { user } = useContext(UserContext);
   const { projects } = useContext(ProjectContext);
 
-  const userHasRole = (projectId: string, role: ROLE | ROLE[]) => {
+  const hasRole = (projectId: string, role: ROLE | ROLE[]) => {
     if (!user) return false;
 
     const userTeamMember = teamMembers.find(teamMember => teamMember.userId === user.uid && teamMember.projectId === projectId);
@@ -59,8 +60,10 @@ export const TeamMemberProvider = ({ children }: TeamMemberProviderProps) => {
     }
   }
 
+  const getTeamMemberName = (teamMemberId: string) => teamMembers.find(teamMember => teamMember.userId === teamMemberId)?.fullName ?? "Removed Team Member";
+
   const fetchTeamMembers = async () => {
-    const teamMemberSnapshots = await Promise.all(projects.map(project => getDocs(query(collection(db, "team members"), where("projectId", "==", project.id)))));
+    const teamMemberSnapshots = await Promise.all(projects.map(project => getDocs(query(collection(db, "teamMembers"), where("projectId", "==", project.id)))));
 
     return (await Promise.all(teamMemberSnapshots.map(async (snapshot) => {
 
@@ -70,6 +73,7 @@ export const TeamMemberProvider = ({ children }: TeamMemberProviderProps) => {
         if (!userData.exists()) throw new Error("Could not retrieve data for user " + teamMemberDocument.data().userId);
 
         return {
+          id: teamMemberDocument.id,
           userId: teamMemberDocument.data().userId,
           projectId: teamMemberDocument.data().projectId,
           firstName: userData.exists() ? userData.data().firstName : "",
@@ -89,7 +93,7 @@ export const TeamMemberProvider = ({ children }: TeamMemberProviderProps) => {
       throw new Error("No user associated with this email");
     }
 
-    await setDoc(doc(db, "team members", userSnapshot.docs[0].id + projectId), {
+    await setDoc(doc(db, "teamMembers", userSnapshot.docs[0].id + projectId), {
       projectId: projectId,
       role: role,
       userId: userSnapshot.docs[0].id
@@ -99,18 +103,21 @@ export const TeamMemberProvider = ({ children }: TeamMemberProviderProps) => {
   }
 
   const removeTeamMember = async (teamMember: TeamMember) => {
+    const developerTicketSnapshot = await getDocs(query(collection(db, "tickets"), where("developerId", "==", teamMember.userId)));
+    const submitterTicketSnapshot = await getDocs(query(collection(db, "tickets"), where("submitterId", "==", teamMember.userId)));
+
     await runTransaction(db, async (transaction) => {
-      transaction.delete(doc(db, "projects", teamMember.projectId, "team members", teamMember.userId));
+      transaction.delete(doc(db, "teamMembers", teamMember.id));
 
-      const userSnapshot = await transaction.get(doc(db, "users", teamMember.userId));
+      for (const ticketDoc of developerTicketSnapshot.docs) {
+        transaction.update(ticketDoc.ref, { developerId: null });
+      }
 
-      if (!userSnapshot.exists()) throw new Error("Could not retrieve user document");
-
-      const filteredProjects = userSnapshot.data().projects.filter((projectId: string) => projectId !== teamMember.projectId);
-
-      transaction.update(doc(db, "users", teamMember.userId), { projects: filteredProjects });
-
+      for (const ticketDoc of submitterTicketSnapshot.docs) {
+        transaction.update(ticketDoc.ref, { submitterId: null });
+      }
     });
+
     setTeamMembers(await fetchTeamMembers());
   }
 
@@ -126,7 +133,8 @@ export const TeamMemberProvider = ({ children }: TeamMemberProviderProps) => {
     teamMembers,
     setTeamMember,
     removeTeamMember,
-    userHasRole
+    hasRole,
+    getTeamMemberName
   }
 
   return (

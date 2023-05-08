@@ -12,6 +12,7 @@ import SignUpPage from "./pages/SignUp/SignUpPage";
 import NewProjectPage from "./pages/NewProject/NewProjectPage";
 import NewTicketPage from "./pages/NewTicket/NewTicketPage";
 import SignOutPage from "./pages/SignOut/SignOutPage";
+import SettingsPage from "./pages/Settings/SettingsPage";
 
 const App = () => {
   return (
@@ -26,8 +27,7 @@ const App = () => {
         <Route path="tickets/:ticketId" element={<TicketPage />} />
         <Route path="tickets/:ticketId/edit" element={<EditTicketPage />} />
         <Route path="newticket" element={<NewTicketPage />} />
-        <Route path="manage" element={<div>Manage Users</div>} />
-        <Route path="settings" element={<div>Settings</div>} />
+        <Route path="settings" element={<SettingsPage />} />
       </Route>
       <Route path="/signin" element={<SignInPage />} />
       <Route path="/signup" element={<SignUpPage />} />

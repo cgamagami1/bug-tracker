@@ -5,6 +5,7 @@ import { collection, getDocs, query, where, deleteDoc, doc, addDoc, updateDoc, s
 import { timestampToDateTime } from "../utils/date-conversion";
 import { db } from "../utils/firebase-config";
 import { ProjectContext } from "./ProjectContext";
+import { TeamMemberContext } from "./TeamMemberContext";
 
 export enum STATUS {
   OPEN = "Open",
@@ -50,13 +51,14 @@ type TicketProviderProps = {
 export const TicketProvider = ({ children }: TicketProviderProps) => {
   const { user } = useContext(UserContext);
   const { projects } = useContext(ProjectContext);
+  const { teamMembers } = useContext(TeamMemberContext);
   const [tickets, setTickets] = useState<Ticket[]>([]);
 
   const fetchTickets = async () => {
     if (!user) return []; 
 
     const ticketSnapshots = await Promise.all(projects.map(project => getDocs(query(collection(db, "tickets"), where("projectId", "==", project.id)))));
-    console.log(ticketSnapshots)
+
     return ticketSnapshots.map(snapshot => {
       return snapshot.docs.map(document => {
         return {
@@ -91,7 +93,7 @@ export const TicketProvider = ({ children }: TicketProviderProps) => {
         const oldValue = ticket[key as keyof TicketMenuData];
 
         if (oldValue !== newValue) {
-          transaction.set(doc(collection(db, "tickets", ticketId, "ticket edits")), {
+          transaction.set(doc(collection(db, "tickets", ticketId, "ticketEdits")), {
             property: key,
             oldValue,
             newValue,
@@ -116,7 +118,7 @@ export const TicketProvider = ({ children }: TicketProviderProps) => {
     }
 
     getMyTickets();
-  }, [projects]);
+  }, [projects, teamMembers]);
 
   const value = {
     tickets,

@@ -18,7 +18,8 @@ export type Project = { id: string; } & ProjectData;
 type ProjectContextValue = {
   projects: Project[];
   addProject: (projectData: ProjectData, ownerId: string) => Promise<void>;
-  updateProject: (projectId: string, projectData: ProjectData) => Promise<void>
+  updateProject: (projectId: string, projectData: ProjectData) => Promise<void>;
+  deleteProject: (project: Project) => Promise<void>;
 }
 
 export const ProjectContext = createContext({} as ProjectContextValue);
@@ -34,7 +35,7 @@ export const ProjectProvider = ({ children }: ProjectProviderProps) => {
   const fetchProjects = async () => {
     if (!user) return [];
 
-    const projectsSnapshot = await getDocs(query(collection(db, "team members"), where("userId", "==", user.uid)));
+    const projectsSnapshot = await getDocs(query(collection(db, "teamMembers"), where("userId", "==", user.uid)));
 
     const projectDocRefs = await Promise.all(projectsSnapshot.docs.map(async document => {
       return await getDoc(doc(db, "projects", document.data().projectId));
@@ -63,7 +64,7 @@ export const ProjectProvider = ({ children }: ProjectProviderProps) => {
         endDate: dateTimeToTimestamp(projectData.endDate)
       });
 
-      transaction.set(doc(db, "team members", ownerId + projectDocRef.id), {
+      transaction.set(doc(db, "teamMembers", ownerId + projectDocRef.id), {
         projectId: projectDocRef.id,
         role: ROLE.OWNER,
         userId: ownerId
@@ -82,6 +83,12 @@ export const ProjectProvider = ({ children }: ProjectProviderProps) => {
     setProjects(await fetchProjects());
   }
 
+  const deleteProject = async (project: Project) => {
+    await runTransaction(db, async (transaction) => {
+      transaction.delete(doc(db, "projects", project.id));
+    });
+  }
+
   useEffect(() => {
     const getProjects = async () => {
       setProjects(await fetchProjects())
@@ -93,7 +100,8 @@ export const ProjectProvider = ({ children }: ProjectProviderProps) => {
   const value = {
     projects,
     addProject,
-    updateProject
+    updateProject,
+    deleteProject
   };
 
   return (

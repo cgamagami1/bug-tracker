@@ -7,21 +7,26 @@ import { TeamMemberProvider } from "../context/TeamMemberContext";
 import { ProjectProvider } from "../context/ProjectContext";
 import { UserContext } from "../context/UserContext";
 import { TicketProvider } from "../context/TicketContext";
+import Loading from "./Loading";
 
 const MainPage = () => {
   const [isSideBarOpen, setIsSideBarOpen] = useState(true);
   const isDesktop = useMediaQuery('(min-width: 1536px)', (isDesktop) => setIsSideBarOpen(isDesktop));
-  const { user } = useContext(UserContext);
+  const { user, isUserLoading } = useContext(UserContext);
   const navigate = useNavigate();
-
-  if (user === null) {
-    navigate("/signin");
-  }
 
   const handleOnCloseSideBar = () => {
     if (!isDesktop) {
       setIsSideBarOpen(false);
     }
+  }
+
+  if (isUserLoading) return (
+    <Loading />
+  );
+
+  if (user === null) {
+    navigate("/signin");
   }
 
   return (

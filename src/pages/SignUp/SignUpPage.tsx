@@ -1,12 +1,12 @@
-import { AuthError, AuthErrorCodes, createUserWithEmailAndPassword } from "firebase/auth";
-import { FormEvent, useState, ChangeEvent } from "react";
+import { AuthError, AuthErrorCodes } from "firebase/auth";
+import { FormEvent, useState, ChangeEvent, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { auth, db } from "../../utils/firebase-config";
 import Button, { BUTTON_STYLES } from "../../components/Button";
-import { doc, setDoc } from "firebase/firestore";
+import { UserContext } from "../../context/UserContext";
 
 const SignUpPage = () => {
   const [formFields, setFormFields] = useState({ firstName: "", lastName: "", email: "", password: "", confirmPassword: "" });
+  const { createUser } = useContext(UserContext);
   const [errorMessage, setErrorMessage] = useState("");
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const navigate = useNavigate();
@@ -23,15 +23,15 @@ const SignUpPage = () => {
       setErrorMessage("Passwords do not match");
     }
     else {
-      try {
-        const { user } = await createUserWithEmailAndPassword(auth, formFields.email, formFields.password);
+      const userData = {
+        firstName: formFields.firstName,
+        lastName: formFields.lastName,
+        email: formFields.email,
+        profilePictureURL: ""
+      };
 
-        await setDoc(doc(db, "users", user.uid), { 
-          firstName: formFields.firstName, 
-          lastName: formFields.lastName,
-          email: formFields.email,
-          projects: []  
-        });
+      try {
+        await createUser(userData, formFields.password);
 
         navigate("/");
       }

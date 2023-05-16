@@ -3,12 +3,11 @@ import { useParams } from "react-router-dom";
 import ProjectMenu from "../../components/ProjectMenu";
 import { useContext } from "react";
 import { ProjectContext } from "../../context/ProjectContext";
-import { ROLE, TeamMemberContext } from "../../context/TeamMemberContext";
+import { ROLE } from "../../context/ProjectContext";
 
 const EditProjectPage = () => {
   const { projectId } = useParams();
-  const { projects } = useContext(ProjectContext);
-  const { hasRole } = useContext(TeamMemberContext);
+  const { projects, hasRole } = useContext(ProjectContext);
   const project = projects.find(project => project.id === projectId);
 
   if (!project || !hasRole(project.id, [ROLE.PROJECT_ADMIN, ROLE.OWNER])) return <></>;

@@ -1,8 +1,9 @@
+import { Link } from "react-router-dom";
 
 const DashboardPage = () => {
   return (
-    <div className="bg-gray-100 flex-grow p-8">
-      <h2 className="text-xl text-gray-700">Dashboard</h2>
+    <div>
+      <h2 className="text-xl mb-6"><Link to="/">Dashboard</Link></h2>
     </div>
   );
 }

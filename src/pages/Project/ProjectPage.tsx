@@ -5,15 +5,13 @@ import DetailsCard from "../../components/DetailsCard";
 import DetailsCardItem from "../../components/DetailsCardItem";
 import PageRow from "../../components/PageRow";
 import { useContext } from "react";
-import { ProjectContext } from "../../context/ProjectContext";
+import { ProjectContext, ROLE } from "../../context/ProjectContext";
 import { TicketContext } from "../../context/TicketContext";
-import { TeamMemberContext, ROLE } from "../../context/TeamMemberContext";
 
 const ProjectPage = () => {
   const { projectId } = useParams();
-  const { projects } = useContext(ProjectContext);
+  const { projects, hasRole } = useContext(ProjectContext);
   const { tickets } = useContext(TicketContext);
-  const { hasRole } = useContext(TeamMemberContext);
   const project = projects.find(project => project.id === projectId);
   
   if (!project) return <></>;

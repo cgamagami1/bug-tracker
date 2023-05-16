@@ -1,16 +1,14 @@
-import { ChangeEvent, FormEvent, useContext, useState } from "react";
+import { ChangeEvent, FormEvent, useContext, useEffect, useState } from "react";
 import { Ticket, PRIORITY, TicketContext } from "../context/TicketContext";
 import Button, { BUTTON_STYLES } from "./Button";
 import { Link, useNavigate } from "react-router-dom";
-import { ProjectContext } from "../context/ProjectContext";
-import { TeamMember, TeamMemberContext } from "../context/TeamMemberContext";
-import { ROLE } from "../context/TeamMemberContext";
+import { ProjectContext, fetchTeamMembers } from "../context/ProjectContext";
 import { UserContext } from "../context/UserContext";
+import { TeamMember, ROLE } from "../context/ProjectContext";
 
 type FormFields = {
   title: string;
   developerId: string;
-  type: "Bug" | 'UI';
   priority: PRIORITY;
   projectId: string;
   description: string;
@@ -20,25 +18,19 @@ type TicketMenuProps = {
   editedItem?: Ticket;
 }
 
-const getDevelopers = (teamMembers: TeamMember[], projectId: string) => {
-  return teamMembers.filter(teamMember => teamMember.projectId === projectId && teamMember.role === ROLE.DEVELOPER);
-}
-
 const TicketMenu = ({ editedItem }: TicketMenuProps) => {
   const { user } = useContext(UserContext);
-  const { projects } = useContext(ProjectContext);
-  const { teamMembers, hasRole } = useContext(TeamMemberContext);
+  const { projects, hasRole } = useContext(ProjectContext);
+  const [developers, setDevelopers] = useState<TeamMember[]>([]);
   const { addTicket, updateTicket, deleteTicket } = useContext(TicketContext);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const submitterProjects = projects.filter(project => hasRole(project.id, [ROLE.SUBMITTER, ROLE.PROJECT_ADMIN, ROLE.OWNER]));
-  const developers = getDevelopers(teamMembers, submitterProjects[0]?.id);
   const navigate = useNavigate();
   
   const [formFields, setFormFields] = useState<FormFields>({
     title: editedItem?.title ?? "",
-    developerId: editedItem?.developerId ?? developers[0]?.userId,
-    type: editedItem?.type ?? "Bug",
+    developerId: editedItem?.developerId ?? "",
     priority: editedItem?.priority ?? PRIORITY.LOW,
     projectId: editedItem?.projectId ?? submitterProjects[0]?.id,
     description: editedItem?.description ?? ""
@@ -50,7 +42,7 @@ const TicketMenu = ({ editedItem }: TicketMenuProps) => {
 
     if (!user) throw new Error("No user authenticated");
 
-    if (!formFields.title || !formFields.developerId || !formFields.type || !formFields.priority || !formFields.projectId) {
+    if (!formFields.title || !formFields.developerId || !formFields.priority || !formFields.projectId) {
       setErrorMessage("One or more required fields missing");
     }
     else {
@@ -88,12 +80,18 @@ const TicketMenu = ({ editedItem }: TicketMenuProps) => {
     navigate(`/tickets`)
   }
 
+  useEffect(() => {
+    const fetchDevelopers = async () => {
+      const newDevelopers = await fetchTeamMembers(["projectId", "==", formFields.projectId], ["role", "==", ROLE.DEVELOPER]);
+      setDevelopers(newDevelopers);
+      setFormFields({ ...formFields, developerId: newDevelopers[0]?.userId ?? "" });
+    }
+
+    fetchDevelopers();
+  }, [formFields.projectId]);
+
   const handleOnChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setFormFields({ ...formFields, [e.target.id]: e.target.value });
-  const handleOnProjectChange = (e: ChangeEvent<HTMLSelectElement>) => setFormFields({ 
-    ...formFields, 
-    projectId: e.target.value, 
-    developerId: getDevelopers(teamMembers, e.target.value)[0]?.userId ?? ""
-  });
+  const handleOnProjectChange = (e: ChangeEvent<HTMLSelectElement>) => setFormFields({ ...formFields, projectId: e.target.value, developerId: developers[0].userId });
 
   return (
     <div className="bg-white rounded-md px-6 py-2 text-sm">
@@ -113,15 +111,6 @@ const TicketMenu = ({ editedItem }: TicketMenuProps) => {
               { developers.map(developer => (
                 <option key={developer.userId} value={developer.userId}>{ developer.fullName }</option>
               )) }
-            </select>
-          </div>
-
-           <div className="flex flex-col gap-1">
-            <label className="font-bold" htmlFor="type">Type</label>
-
-             <select className="focus:outline-none border rounded-md h-9 px-2" id="type" value={formFields.type} onChange={handleOnChange}>
-              <option value="Bug">Bug</option>
-              <option value="UI">UI</option>
             </select>
           </div>
 

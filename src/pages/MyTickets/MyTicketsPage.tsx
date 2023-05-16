@@ -4,12 +4,11 @@ import Button, { BUTTON_STYLES } from "../../components/Button";
 import { useContext } from "react";
 import { ProjectContext } from "../../context/ProjectContext";
 import { TicketContext } from "../../context/TicketContext";
-import { TeamMemberContext, ROLE } from "../../context/TeamMemberContext";
+import { ROLE } from "../../context/ProjectContext";
 
 const MyTicketsPage = () => {
-  const { projects } = useContext(ProjectContext);
+  const { projects, hasRole } = useContext(ProjectContext);
   const { tickets } = useContext(TicketContext);
-  const { hasRole } = useContext(TeamMemberContext);
   const submitterProjects = projects.filter(project => hasRole(project.id, [ROLE.SUBMITTER, ROLE.PROJECT_ADMIN, ROLE.OWNER]));
 
   return (

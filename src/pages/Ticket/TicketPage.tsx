@@ -5,14 +5,14 @@ import { Link, useParams } from "react-router-dom";
 import TicketHistoryTable from "./TicketHistoryTable";
 import CommentsTable from "./CommentsTable";
 import { useContext } from "react";
-import { ProjectContext } from "../../context/ProjectContext";
-import { ROLE, TeamMemberContext } from "../../context/TeamMemberContext";
+import { ProjectContext, ROLE } from "../../context/ProjectContext";
 import { TicketContext } from "../../context/TicketContext";
+import { UserContext } from "../../context/UserContext";
 
 const TicketPage = () => {
   const { ticketId } = useParams();
-  const { projects } = useContext(ProjectContext);
-  const { getTeamMemberName, hasRole } = useContext(TeamMemberContext);
+  const { projects, hasRole } = useContext(ProjectContext);
+  const { user } = useContext(UserContext);
   const { tickets } = useContext(TicketContext);
   const ticket = tickets.find(ticket => ticket.id === ticketId);
   const project = projects.find(project => project.id === ticket?.projectId);
@@ -23,14 +23,13 @@ const TicketPage = () => {
     <div>
       <h2 className="text-xl mb-6"><Link to="/projects">My Projects</Link> &gt; <Link to={`/projects/${ticket.projectId}`}>{ project.title }</Link> &gt; <Link to={`/tickets/${ticketId}`}>{ ticket.title }</Link></h2>
       <PageRow>
-        <DetailsCard title={ticket.title} canEdit={hasRole(ticket.projectId, [ROLE.SUBMITTER, ROLE.PROJECT_ADMIN, ROLE.OWNER])}>
+        <DetailsCard title={ticket.title} canEdit={hasRole(ticket.projectId, [ROLE.PROJECT_ADMIN, ROLE.OWNER] || ticket.submitterId === user?.uid)}>
           {ticket.description && <DetailsCardItem name="Description" value={ticket.description} />}
           <DetailsCardItem name="Project" value={project.title ?? ""} />
-          <DetailsCardItem name="Developer" value={getTeamMemberName(ticket.developerId)} />
-          <DetailsCardItem name="Submitter" value={getTeamMemberName(ticket.submitterId)} />
+          <DetailsCardItem name="Developer" value={ticket.developerName} />
+          <DetailsCardItem name="Submitter" value={ticket.submitterName} />
           <DetailsCardItem name="Status" value={ticket.status} />
           <DetailsCardItem name="Priority" value={ticket.priority} />
-          <DetailsCardItem name="Type" value={ticket.type} />
           <DetailsCardItem name="Date Created" value={ticket.dateCreated.toISODate()} />
         </DetailsCard>
         <TicketHistoryTable ticketId={ticket.id} />

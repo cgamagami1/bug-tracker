@@ -4,9 +4,9 @@ import TableRow from "./TableRow";
 import TableData from "./TableData";
 import useTable from "../utils/useTable";
 import { Link } from "react-router-dom";
-import { useContext } from "react";
 import { Ticket } from "../context/TicketContext";
-import { TeamMemberContext } from "../context/TeamMemberContext";
+import { useState } from "react";
+import StatusMenu from "../pages/Ticket/StatusMenu";
 
 type TicketsTableProps = {
   entriesPerPage?: number;
@@ -14,7 +14,7 @@ type TicketsTableProps = {
 }
 
 const TicketsTable = ({ entriesPerPage = 5, tickets }: TicketsTableProps) => {
-  const { getTeamMemberName } = useContext(TeamMemberContext);
+  const [statusMenuTicket, setStatusMenuTicket] = useState<Ticket | null>(null);
 
   const { 
     sortedEntries, 
@@ -25,7 +25,11 @@ const TicketsTable = ({ entriesPerPage = 5, tickets }: TicketsTableProps) => {
     firstShownPageButton,
     footerInfo
   } = useTable(tickets, entriesPerPage);
-  
+
+  const handleOnCloseStatusMenu = () => {
+    setStatusMenuTicket(null);
+  }
+
   return (
     <TableContainer title="Tickets" currentPage={currentPage} handleOnNewPage={handleOnNewPage} firstShownPageButton={firstShownPageButton} footerInfo={footerInfo}>
       <table>
@@ -45,19 +49,23 @@ const TicketsTable = ({ entriesPerPage = 5, tickets }: TicketsTableProps) => {
             sortedEntries.map(ticket => (
               <TableRow key={ticket.id}>
                 <TableData>{ ticket.title }</TableData>
-                <TableData hideOnMobile>{ getTeamMemberName(ticket.submitterId) }</TableData>
-                <TableData hideOnMobile>{ getTeamMemberName(ticket.developerId) }</TableData>
+                <TableData hideOnMobile>{ ticket.submitterName }</TableData>
+                <TableData hideOnMobile>{ ticket.developerName }</TableData>
                 <TableData>{ ticket.status }</TableData>
                 <TableData hideOnMobile>{ ticket.priority }</TableData>
                 <TableData hideOnMobile>{ ticket.dateCreated.toISODate() }</TableData>
                 <TableData>
-                  <Link className="hover:underline text-purple-700" to={`/tickets/${ticket.id}`}>More Details</Link>
+                  <div className="flex flex-col">
+                    <Link className="hover:underline text-purple-700" to={`/tickets/${ticket.id}`}>More Details</Link>
+                    <span className="hover:underline text-purple-700 hover:cursor-pointer" onClick={() => setStatusMenuTicket(ticket)}>Set Status</span>
+                  </div>
                 </TableData>
               </TableRow>
             ))
           }
         </tbody>
       </table>
+      {statusMenuTicket && <StatusMenu ticket={statusMenuTicket} handleOnCloseMenu={handleOnCloseStatusMenu} />}
     </TableContainer>
   );
 }

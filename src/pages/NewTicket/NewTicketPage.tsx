@@ -1,12 +1,10 @@
 import { Link } from "react-router-dom";
 import TicketMenu from "../../components/TicketMenu";
 import { useContext } from "react";
-import { ProjectContext } from "../../context/ProjectContext";
-import { TeamMemberContext, ROLE } from "../../context/TeamMemberContext";
+import { ProjectContext, ROLE } from "../../context/ProjectContext";
 
 const NewTicketPage = () => {
-  const { projects } = useContext(ProjectContext);
-  const { hasRole } = useContext(TeamMemberContext);
+  const { projects, hasRole } = useContext(ProjectContext);
   const submitterProjects = projects.filter(project => hasRole(project.id, [ROLE.SUBMITTER, ROLE.PROJECT_ADMIN, ROLE.OWNER]));
 
   if (!submitterProjects.length) return <></>;

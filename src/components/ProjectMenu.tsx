@@ -2,9 +2,8 @@ import { ChangeEvent, FormEvent, useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { DateTime } from "luxon";
 import { UserContext } from "../context/UserContext";
-import { Project, ProjectContext } from "../context/ProjectContext";
+import { Project, ProjectContext, ROLE} from "../context/ProjectContext";
 import Button, { BUTTON_STYLES } from "./Button";
-import { TeamMemberContext, ROLE } from "../context/TeamMemberContext";
 
 type FormFields = {
   title: string;
@@ -24,11 +23,9 @@ const ProjectMenu = ({ editedItem }: ProjectMenuProps) => {
     startDate: editedItem?.startDate ?? null, 
     endDate: editedItem?.endDate ?? null
   });
-
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useContext(UserContext);
-  const { addProject, updateProject, deleteProject } = useContext(ProjectContext);
-  const { hasRole } = useContext(TeamMemberContext);
+  const { addProject, updateProject, deleteProject, hasRole } = useContext(ProjectContext);
   const navigate = useNavigate();
 
   if (!user) return <></>;

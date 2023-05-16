@@ -3,7 +3,6 @@ import useTable from "../../utils/useTable";
 import TableContainer from "../../components/TableContainer";
 import trash from "../../assets/trash.svg";
 import { ChangeEvent, FormEvent, useContext, useEffect, useState } from "react";
-import { TeamMemberContext } from "../../context/TeamMemberContext";
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, serverTimestamp } from "firebase/firestore";
 import { db } from "../../utils/firebase-config";
 import { UserContext } from "../../context/UserContext";
@@ -13,6 +12,8 @@ import { timestampToDateTime } from "../../utils/date-conversion";
 export type Comment = {
   id: string;
   posterId: string;
+  posterName: string;
+  profilePicture: string;
   message: string;
   datePosted: DateTime;
 }
@@ -23,7 +24,6 @@ type CommentTableProps = {
 
 const CommentsTable = ({ ticketId }: CommentTableProps) => {
   const [comments, setComments] = useState<Comment[]>([]);
-  const { getTeamMemberName } = useContext(TeamMemberContext);
   const { user } = useContext(UserContext);
   const [newComment, setNewComment] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -39,16 +39,22 @@ const CommentsTable = ({ ticketId }: CommentTableProps) => {
   const fetchComments = async () => {
     const commentSnapshot = await getDocs(collection(db, "tickets", ticketId, "comments"));
 
-    return commentSnapshot.docs.map(document => {
+    return await Promise.all(commentSnapshot.docs.map(async (document) => {
       const docData = document.data();
+
+      const posterDoc = await getDoc(doc(db, "users", docData.posterId));
+      const posterName = posterDoc.exists() ? `${posterDoc.data().firstName} ${posterDoc.data().lastName}` : "Removed Team Member";
+      const profilePicture = posterDoc.exists() ? posterDoc.data().profilePicture : "";
 
       return {
         id: document.id,
         posterId: docData.posterId,
+        posterName,
+        profilePicture,
         message: docData.message,
         datePosted: timestampToDateTime(docData.datePosted)
       } as Comment;
-    });
+    }));
   }
 
   const handleOnAddComment = async (e: FormEvent<HTMLFormElement>) => {
@@ -93,14 +99,14 @@ const CommentsTable = ({ ticketId }: CommentTableProps) => {
       {
         sortedEntries.map(comment => (
           <div key={comment.id} className="flex px-2 mb-6 items-start gap-4 justify-between">
-            <img className="rounded-full w-10" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" alt="profile picture" />
+            <img className="rounded-full w-10" src={comment.profilePicture} alt="profile picture" />
 
             <div className="flex-grow">
-              <p><span className="font-bold">{ getTeamMemberName(comment.posterId) }</span> { comment.datePosted?.toISODate() }</p>
+              <p><span className="font-bold">{ comment.posterName }</span> { comment.datePosted?.toISODate() }</p>
               <p className="inline-block">{ comment.message }</p>
             </div>
 
-            <img className="w-4 hover:cursor-pointer" src={trash} alt="trash icon" onClick={() => handleOnDeleteComment(comment)} />
+            {user?.uid === comment.posterId && <img className="w-4 hover:cursor-pointer" src={trash} alt="trash icon" onClick={() => handleOnDeleteComment(comment)} />}
           </div>
         ))
       }

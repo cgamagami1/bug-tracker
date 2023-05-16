@@ -4,12 +4,12 @@ import useTable from "../../utils/useTable";
 import TableHeader from "../../components/TableHeader";
 import TableRow from "../../components/TableRow";
 import TableData from "../../components/TableData";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../utils/firebase-config";
 import { timestampToDateTime } from "../../utils/date-conversion";
 import { TicketMenuData } from "../../context/TicketContext";
-import { TeamMemberContext } from "../../context/TeamMemberContext";
+import { getTeamMemberName } from "../../context/ProjectContext";
 
 const propertyTitle = (property: string) => {
   switch (property) {
@@ -34,23 +34,22 @@ type TicketHistoryTableProps = {
 
 const TicketHistoryTable = ({ ticketId }: TicketHistoryTableProps) => {
   const [ticketEdits, setTicketEdits] = useState<TicketEdit<TicketMenuData[keyof TicketMenuData]>[]>([]);
-  const { getTeamMemberName } = useContext(TeamMemberContext);
 
   useEffect(() => {
     const getTicketEdits = async () => {
       const ticketEditSnapshot = await getDocs(collection(db, "tickets", ticketId, "ticketEdits"));
 
-      const ticketEditList = ticketEditSnapshot.docs.map(document => {
+      const ticketEditList = await Promise.all(ticketEditSnapshot.docs.map(async (document) => {
         const docData = document.data();
 
         return {
           id: document.id,
           property: docData.property,
-          oldValue: docData.oldValue,
-          newValue: docData.newValue,
+          oldValue: docData.property === "developerId" ? await getTeamMemberName(docData.oldValue) : docData.oldValue,
+          newValue: docData.property === "developerId" ? await getTeamMemberName(docData.newValue) : docData.newValue,
           dateChanged: timestampToDateTime(docData.dateChanged)
         } as TicketEdit<typeof docData.newValue>;
-      });
+      }));
 
       setTicketEdits(ticketEditList);
     }
@@ -85,8 +84,8 @@ const TicketHistoryTable = ({ ticketId }: TicketHistoryTableProps) => {
             sortedEntries.map(ticketEdit => (
               <TableRow key={ticketEdit.id}>
                 <TableData>{ propertyTitle(ticketEdit.property) }</TableData>
-                <TableData>{ ticketEdit.property === "developerId" ? getTeamMemberName(ticketEdit.oldValue) : ticketEdit.oldValue }</TableData>
-                <TableData>{ ticketEdit.property === "developerId" ? getTeamMemberName(ticketEdit.newValue) : ticketEdit.newValue }</TableData>
+                <TableData>{ ticketEdit.oldValue }</TableData>
+                <TableData>{ ticketEdit.newValue }</TableData>
                 <TableData>{ ticketEdit.dateChanged.toISODate() }</TableData>
               </TableRow>
             ))

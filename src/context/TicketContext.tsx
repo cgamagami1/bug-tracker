@@ -1,11 +1,10 @@
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { DateTime } from "luxon";
 import { UserContext } from "./UserContext";
-import { collection, getDocs, query, where, deleteDoc, doc, addDoc, updateDoc, serverTimestamp, runTransaction } from "firebase/firestore";
+import { collection, getDocs, query, where, deleteDoc, doc, addDoc, updateDoc, serverTimestamp, runTransaction, getDoc, setDoc } from "firebase/firestore";
 import { timestampToDateTime } from "../utils/date-conversion";
 import { db } from "../utils/firebase-config";
-import { ProjectContext } from "./ProjectContext";
-import { TeamMemberContext } from "./TeamMemberContext";
+import { ProjectContext, getTeamMemberName } from "./ProjectContext";
 
 export enum STATUS {
   OPEN = "Open",
@@ -25,7 +24,6 @@ export type TicketMenuData = {
   submitterId: string;
   developerId: string;
   projectId: string;
-  type: "Bug" | 'UI';
   priority: PRIORITY;
 }
 
@@ -33,6 +31,8 @@ export type Ticket = {
   id: string; 
   status: STATUS;
   dateCreated: DateTime;
+  developerName: string;
+  submitterName: string;
 } & TicketMenuData;
 
 type TicketContextValue = {
@@ -40,6 +40,7 @@ type TicketContextValue = {
   addTicket: (ticketData: TicketMenuData) => void;
   updateTicket: (ticketId: string, ticketData: TicketMenuData) => void;
   deleteTicket: (ticket: Ticket) => void;
+  setTicketStatus: (ticket: Ticket, status: STATUS) => void;
 }
 
 export const TicketContext = createContext({} as TicketContextValue);
@@ -51,7 +52,6 @@ type TicketProviderProps = {
 export const TicketProvider = ({ children }: TicketProviderProps) => {
   const { user } = useContext(UserContext);
   const { projects } = useContext(ProjectContext);
-  const { teamMembers } = useContext(TeamMemberContext);
   const [tickets, setTickets] = useState<Ticket[]>([]);
 
   const fetchTickets = async () => {
@@ -59,15 +59,19 @@ export const TicketProvider = ({ children }: TicketProviderProps) => {
 
     const ticketSnapshots = await Promise.all(projects.map(project => getDocs(query(collection(db, "tickets"), where("projectId", "==", project.id)))));
 
-    return ticketSnapshots.map(snapshot => {
-      return snapshot.docs.map(document => {
+    return (await Promise.all(ticketSnapshots.map(async (snapshot) => {
+      return await Promise.all(snapshot.docs.map(async (document) => {
+        const data = document.data();
+
         return {
-          ...document.data(),
+          ...data,
           id: document.id,
-          dateCreated: timestampToDateTime(document.data().dateCreated),
+          developerName: await getTeamMemberName(data.developerId),
+          submitterName: await getTeamMemberName(data.submitterId) ,
+          dateCreated: timestampToDateTime(data.dateCreated),
         } as Ticket;
-      });
-    }).flat();
+      }));
+    }))).flat();
   }
 
   const addTicket = async (ticketData: TicketMenuData) => {
@@ -76,6 +80,12 @@ export const TicketProvider = ({ children }: TicketProviderProps) => {
       status: STATUS.OPEN,
       dateCreated: serverTimestamp()
     });
+
+    setTickets(await fetchTickets());
+  }
+
+  const setTicketStatus = async (ticket: Ticket, status: STATUS) => {
+    await updateDoc(doc(db, "tickets", ticket.id), { status });
 
     setTickets(await fetchTickets());
   }
@@ -118,13 +128,14 @@ export const TicketProvider = ({ children }: TicketProviderProps) => {
     }
 
     getMyTickets();
-  }, [projects, teamMembers]);
+  }, [projects]);
 
   const value = {
     tickets,
     addTicket,
     updateTicket,
-    deleteTicket
+    deleteTicket,
+    setTicketStatus
   };
 
   return (

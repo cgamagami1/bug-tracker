@@ -3,17 +3,27 @@ import TableHeader from "../../components/TableHeader";
 import useTable from "../../utils/useTable";
 import TableRow from "../../components/TableRow";
 import TableData from "../../components/TableData";
-import { ChangeEvent, useContext } from "react";
-import { ROLE, TeamMemberContext } from "../../context/TeamMemberContext";
 import AddTeamMemberCard from "./AddTeamMemberCard";
+import { useContext, useEffect, useState } from "react";
+import { ProjectContext, TeamMember, responseToTeamMembers, ROLE, fetchTeamMembers } from "../../context/ProjectContext";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "../../utils/firebase-config";
 
 type TeamMemberTableProps = {
   projectId: string;
 }
 
 const TeamMemberTable = ({ projectId }: TeamMemberTableProps) => {
-  const { teamMembers, removeTeamMember, hasRole } = useContext(TeamMemberContext);
-  const projectTeamMembers = teamMembers.filter(teamMember => teamMember.projectId === projectId);
+  const { projects, hasRole, removeTeamMember } = useContext(ProjectContext);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+
+  useEffect(() => {
+    const fetchProjectTeamMembers = async () => {
+      setTeamMembers(await fetchTeamMembers(["projectId", "==", projectId]));
+    }
+
+    fetchProjectTeamMembers();
+  }, [projects]);
 
   const { 
     sortedEntries, 
@@ -23,7 +33,7 @@ const TeamMemberTable = ({ projectId }: TeamMemberTableProps) => {
     handleOnNewPage,
     firstShownPageButton,
     footerInfo
-  } = useTable(projectTeamMembers);
+  } = useTable(teamMembers);
 
   return (
     <TableContainer title="Team Members" currentPage={currentPage} handleOnNewPage={handleOnNewPage} firstShownPageButton={firstShownPageButton} footerInfo={footerInfo}>
@@ -52,7 +62,7 @@ const TeamMemberTable = ({ projectId }: TeamMemberTableProps) => {
           }
         </tbody>
       </table>
-      <AddTeamMemberCard projectId={projectId} />
+      {hasRole(projectId, [ROLE.PROJECT_ADMIN, ROLE.OWNER]) && <AddTeamMemberCard projectId={projectId} />}
     </TableContainer>
   );
 }

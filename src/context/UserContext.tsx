@@ -1,4 +1,4 @@
-import { User, onAuthStateChanged, createUserWithEmailAndPassword } from "firebase/auth";
+import { User, onAuthStateChanged, createUserWithEmailAndPassword, updateEmail } from "firebase/auth";
 import { ReactNode, createContext, useEffect, useState } from "react";
 import { auth, db, storage } from "../utils/firebase-config";
 import { doc, getDoc, setDoc } from "firebase/firestore";
@@ -11,7 +11,10 @@ type BaseUserData = {
 }
 
 export type UserData = BaseUserData & { profilePicture: string };
-export type UpdatedUserData = BaseUserData & { profilePicture: File | string };
+export type UpdatedUserData = BaseUserData & { 
+  profilePicture: File | string;
+  password: string; 
+}
 
 type UserContextValue = {
   user: User | null;
@@ -59,6 +62,8 @@ export const UserProvider = ({ children }: UserProviderProps) => {
       email: userData.email,
       profilePicture: await fileToURL(userData.profilePicture)
     });
+
+    if (user) await updateEmail(user, userData.email);
   } 
 
   useEffect(() => {

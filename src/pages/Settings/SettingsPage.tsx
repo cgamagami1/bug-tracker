@@ -65,7 +65,7 @@ const SettingsPage = () => {
     <div>
       <h2 className="text-xl mb-6"><Link to="/settings">Settings</Link></h2>
 
-      <form className={`bg-white rounded-md px-6 py-2 flex-grow text-sm text-left gap-4`} onSubmit={handleOnSubmit}>
+      <form className="bg-white rounded-md px-6 py-2 flex-grow text-sm text-left gap-4" onSubmit={handleOnSubmit}>
         <h3 className="text-xl p-2 border-b border-gray-400">My Settings</h3>
 
         <div className="flex-col flex px-2 py-4 w-72">

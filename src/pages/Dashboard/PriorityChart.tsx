@@ -8,6 +8,9 @@ import {
   Legend,
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
+import { chartOptions } from './DashboardPage';
+import { useContext } from 'react';
+import { PRIORITY, Ticket, TicketContext } from '../../context/TicketContext';
 
 ChartJS.register(
   CategoryScale,
@@ -19,27 +22,29 @@ ChartJS.register(
 );
 
 const PriorityChart = () => {
-  const options = {
-    responsive: true,
-    plugins: {
-    },
-  };
+  const { tickets } = useContext(TicketContext);
 
-  const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+  const priorityReducer = (priority: PRIORITY) => (acc: number, ticket: Ticket) => ticket.priority === priority ? acc + 1 : acc;
+
+  const lowPriorityCount = tickets.reduce(priorityReducer(PRIORITY.LOW), 0);
+  const mediumPriorityCount = tickets.reduce(priorityReducer(PRIORITY.MEDIUM), 0);
+  const highPriorityCount = tickets.reduce(priorityReducer(PRIORITY.HIGH), 0);
 
   const data = {
-    labels,
+    labels: ["Low", "Medium", "High"],
     datasets: [
       {
-        label: 'Dataset 1',
-        data: [],
-        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+        label: 'Priority',
+        data: [lowPriorityCount, mediumPriorityCount, highPriorityCount],
+        backgroundColor: ['#70ff6388', '#fceb4e88', '#ff638488'],
       },
     ],
   };
 
   return (
-    <Bar options={options} data={data} />
+    <div className='flex-grow my-2'>
+      <Bar options={chartOptions} data={data} />
+    </div>
   );
 }
 

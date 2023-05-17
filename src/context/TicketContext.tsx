@@ -31,6 +31,7 @@ export type Ticket = {
   id: string; 
   status: STATUS;
   dateCreated: DateTime;
+  dateClosed: DateTime;
   developerName: string;
   submitterName: string;
 } & TicketMenuData;
@@ -69,6 +70,7 @@ export const TicketProvider = ({ children }: TicketProviderProps) => {
           developerName: await getTeamMemberName(data.developerId),
           submitterName: await getTeamMemberName(data.submitterId) ,
           dateCreated: timestampToDateTime(data.dateCreated),
+          dateClosed: timestampToDateTime(data.dateClosed)
         } as Ticket;
       }));
     }))).flat();
@@ -78,14 +80,18 @@ export const TicketProvider = ({ children }: TicketProviderProps) => {
     await addDoc(collection(db, "tickets"), {
       ...ticketData,
       status: STATUS.OPEN,
-      dateCreated: serverTimestamp()
+      dateCreated: serverTimestamp(),
+      dateClosed: null
     });
 
     setTickets(await fetchTickets());
   }
 
   const setTicketStatus = async (ticket: Ticket, status: STATUS) => {
-    await updateDoc(doc(db, "tickets", ticket.id), { status });
+    await updateDoc(doc(db, "tickets", ticket.id), { 
+      status,
+      dateClosed: status === STATUS.CLOSED ? serverTimestamp() : null  
+    });
 
     setTickets(await fetchTickets());
   }

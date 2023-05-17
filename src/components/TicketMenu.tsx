@@ -91,7 +91,7 @@ const TicketMenu = ({ editedItem }: TicketMenuProps) => {
   }, [formFields.projectId]);
 
   const handleOnChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setFormFields({ ...formFields, [e.target.id]: e.target.value });
-  const handleOnProjectChange = (e: ChangeEvent<HTMLSelectElement>) => setFormFields({ ...formFields, projectId: e.target.value, developerId: developers[0].userId });
+  const handleOnProjectChange = (e: ChangeEvent<HTMLSelectElement>) => setFormFields({ ...formFields, projectId: e.target.value, developerId: developers[0]?.userId ?? "" });
 
   return (
     <div className="bg-white rounded-md px-6 py-2 text-sm">

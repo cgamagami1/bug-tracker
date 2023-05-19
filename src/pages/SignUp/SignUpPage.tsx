@@ -3,6 +3,7 @@ import { FormEvent, useState, ChangeEvent, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Button, { BUTTON_STYLES } from "../../components/Button";
 import { UserContext } from "../../context/UserContext";
+import SignInAsGuest from "../../components/SignInAsGuest";
 
 const SignUpPage = () => {
   const [formFields, setFormFields] = useState({ firstName: "", lastName: "", email: "", password: "", confirmPassword: "" });
@@ -27,7 +28,7 @@ const SignUpPage = () => {
         firstName: formFields.firstName,
         lastName: formFields.lastName,
         email: formFields.email,
-        profilePictureURL: ""
+        profilePicture: ""
       };
 
       try {
@@ -89,6 +90,7 @@ const SignUpPage = () => {
 
         <Button type="submit" title="Sign Up" isLoading={isAuthLoading} style={BUTTON_STYLES.AUTH} />
         <span className="text-center p-3">Already have an account? <Link className="text-purple-600 hover:underline" to="/signin">Sign In</Link></span>
+        <SignInAsGuest />
         <span className="text-center text-red-600">{ errorMessage }</span>
       </form>
     </div>

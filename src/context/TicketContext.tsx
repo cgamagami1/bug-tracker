@@ -38,7 +38,7 @@ export type Ticket = {
 
 type TicketContextValue = {
   tickets: Ticket[];
-  addTicket: (ticketData: TicketMenuData) => void;
+  addTicket: (ticketData: TicketMenuData) => Promise<string>;
   updateTicket: (ticketId: string, ticketData: TicketMenuData) => void;
   deleteTicket: (ticket: Ticket) => void;
   setTicketStatus: (ticket: Ticket, status: STATUS) => void;
@@ -76,8 +76,8 @@ export const TicketProvider = ({ children }: TicketProviderProps) => {
     }))).flat();
   }
 
-  const addTicket = async (ticketData: TicketMenuData) => {
-    await addDoc(collection(db, "tickets"), {
+  const addTicket = async (ticketData: TicketMenuData): Promise<string> => {
+    const ticketDoc = await addDoc(collection(db, "tickets"), {
       ...ticketData,
       status: STATUS.OPEN,
       dateCreated: serverTimestamp(),
@@ -85,6 +85,7 @@ export const TicketProvider = ({ children }: TicketProviderProps) => {
     });
 
     setTickets(await fetchTickets());
+    return ticketDoc.id;
   }
 
   const setTicketStatus = async (ticket: Ticket, status: STATUS) => {

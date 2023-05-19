@@ -42,7 +42,7 @@ export type Project = { id: string; } & ProjectData;
 
 type ProjectContextValue = {
   projects: Project[];
-  addProject: (projectData: ProjectData, ownerId: string) => Promise<void>;
+  addProject: (projectData: ProjectData, ownerId: string) => Promise<Project>;
   updateProject: (projectId: string, projectData: ProjectData) => Promise<void>;
   deleteProject: (project: Project) => Promise<void>;
   addTeamMember: (userId: string, projectId: string, role: ROLE) => void;
@@ -139,9 +139,9 @@ export const ProjectProvider = ({ children }: ProjectProviderProps) => {
   }
   
   const addProject = async (projectData: ProjectData, ownerId: string) => {
-    await runTransaction(db, async (transaction) => {
-      const projectDocRef = doc(collection(db, "projects"));
+    const projectDocRef = doc(collection(db, "projects"));
 
+    await runTransaction(db, async (transaction) => {
       transaction.set(projectDocRef, {
         ...projectData,
         startDate: dateTimeToTimestamp(projectData.startDate),
@@ -155,7 +155,11 @@ export const ProjectProvider = ({ children }: ProjectProviderProps) => {
       });
     });
 
-    fetchProjects();
+    await fetchProjects();
+    return {
+      id: projectDocRef.id,
+      ...projectData
+    };
   }
 
   const updateProject = async (projectId: string, projectData: ProjectData) => {
@@ -164,7 +168,7 @@ export const ProjectProvider = ({ children }: ProjectProviderProps) => {
       startDate: dateTimeToTimestamp(projectData.startDate),
       endDate: dateTimeToTimestamp(projectData.endDate)
     })
-    fetchProjects();
+    await fetchProjects();
   }
 
   const deleteProject = async (project: Project) => {
@@ -188,7 +192,7 @@ export const ProjectProvider = ({ children }: ProjectProviderProps) => {
       }
     });
 
-    fetchProjects();
+    await fetchProjects();
   }
 
   const addTeamMember = async (userId: string, projectId: string, role: ROLE) => {
@@ -203,8 +207,7 @@ export const ProjectProvider = ({ children }: ProjectProviderProps) => {
       userId: userId
     });
 
-
-    fetchProjects();
+    await fetchProjects();
   }
 
   const removeTeamMember = async (teamMember: TeamMember) => {
@@ -223,7 +226,7 @@ export const ProjectProvider = ({ children }: ProjectProviderProps) => {
       }
     });
 
-    fetchProjects();
+    await fetchProjects();
   }
   
   useEffect(() => {
@@ -237,11 +240,7 @@ export const ProjectProvider = ({ children }: ProjectProviderProps) => {
   }, [projects]);
 
   useEffect(() => {
-    const getProjects = async () => {
-      fetchProjects();
-    }
-
-    getProjects();
+    fetchProjects();
   }, [user]);
 
   const value = {

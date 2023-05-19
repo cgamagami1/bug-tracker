@@ -1,8 +1,9 @@
-import { User, onAuthStateChanged, createUserWithEmailAndPassword, updateEmail } from "firebase/auth";
+import { User, onAuthStateChanged, createUserWithEmailAndPassword, updateEmail, signInAnonymously } from "firebase/auth";
 import { ReactNode, createContext, useEffect, useState } from "react";
 import { auth, db, storage } from "../utils/firebase-config";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { getDownloadURL, uploadBytes, ref } from "firebase/storage";
+import _ from "lodash";
 
 type BaseUserData = {
   firstName: string;
@@ -19,7 +20,8 @@ export type UpdatedUserData = BaseUserData & {
 type UserContextValue = {
   user: User | null;
   userData: UserData;
-  createUser: (userData: UserData, password: string) => void;
+  createUser: (userData: BaseUserData, password: string) => Promise<User>;
+  createAnonymousUser: (baseUserData: BaseUserData) => Promise<User>;
   updateUserData: (userData: UserData | UpdatedUserData) => void;
   isUserLoading: boolean;
 }
@@ -35,16 +37,28 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   const [userData, setUserData] = useState<UserData>({ firstName: "", lastName: "", email: "", profilePicture: "" });
   const [isUserLoading, setIsUserLoading] = useState(true);
 
-  const createUser = async (baseUserData: BaseUserData, password: string) => {
+  const createAnonymousUser = async (baseUserData: BaseUserData): Promise<User> => {
+    const { user: createdUser } = await signInAnonymously(auth);
+
+    await updateUserData({ 
+      ...baseUserData, 
+      profilePicture: await getDownloadURL(ref(storage, "profilePictures/pexels-pok-rie-130574.jpg"))
+    }, createdUser);
+    return createdUser;
+  }
+
+  const createUser = async (baseUserData: BaseUserData, password: string): Promise<User> => {
     const { user: createdUser } = await createUserWithEmailAndPassword(auth, baseUserData.email, password);
 
-    const profilePicture = await getDownloadURL(ref(storage, "profilePictures/pexels-pok-rie-130574.jpg"));
-
-    updateUserData({ ...baseUserData, profilePicture }, createdUser);
+    updateUserData({ 
+      ...baseUserData, 
+      profilePicture: await getDownloadURL(ref(storage, "profilePictures/pexels-pok-rie-130574.jpg"))
+    }, createdUser);
+    return createdUser;
   }
 
   const updateUserData = async (userData: UserData | UpdatedUserData, createdUser?: User) => {
-    const id = user?.uid ?? createdUser?.uid ?? null;
+    const id = createdUser?.uid ?? user?.uid ?? null;
 
     if (!id) throw new Error("Cannot update user: No user authenticated");
 
@@ -67,7 +81,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   } 
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, setUser);
+    const unsubscribe = onAuthStateChanged(auth, (user) => setUser(_.cloneDeep(user)));
 
     return unsubscribe;
   }, []);
@@ -98,6 +112,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     user,
     userData,
     createUser,
+    createAnonymousUser,
     updateUserData,
     isUserLoading
   }

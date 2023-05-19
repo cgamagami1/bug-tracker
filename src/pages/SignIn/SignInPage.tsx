@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Button, { BUTTON_STYLES } from "../../components/Button";
 import { AuthError, AuthErrorCodes, signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../utils/firebase-config";
+import SignInAsGuest from "../../components/SignInAsGuest";
 
 const SignInPage = () => {
   const [formFields, setFormFields] = useState({ email: "", password: "" });
@@ -58,6 +59,7 @@ const SignInPage = () => {
 
         <Button title="Sign In" type="submit" isLoading={isAuthLoading} style={BUTTON_STYLES.AUTH} />
         <span className="text-center p-3">Don't have an account? <Link className="text-purple-600 hover:underline" to="/signup">Sign Up</Link></span>
+        <SignInAsGuest />
         <span className="text-center text-red-600">{ errorMessage }</span>
       </form>
     </div>

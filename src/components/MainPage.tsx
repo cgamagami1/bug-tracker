@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import SideBar from "./SideBar";
 import HeaderBar from "./HeaderBar";
@@ -6,6 +6,8 @@ import useMediaQuery from "../utils/useMediaQuery";
 import { UserContext } from "../context/UserContext";
 import Loading from "./Loading";
 import CatchError from "./CatchError";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../utils/firebase-config";
 
 const MainPage = () => {
   const [isSideBarOpen, setIsSideBarOpen] = useState(true);
@@ -36,10 +38,14 @@ const MainPage = () => {
     setIsSearchBoxOpen(true);
   }
 
-  if (isUserLoading) return (
-    <Loading />
-  );
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) return <Loading />;
+    });
 
+    return unsubscribe;
+  }, []);
+  
   if (user === null) {
     navigate("/signin");
   }

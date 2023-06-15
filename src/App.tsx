@@ -13,11 +13,12 @@ import NewProjectPage from "./pages/NewProject/NewProjectPage";
 import NewTicketPage from "./pages/NewTicket/NewTicketPage";
 import SignOutPage from "./pages/SignOut/SignOutPage";
 import SettingsPage from "./pages/Settings/SettingsPage";
+import CatchError from "./components/CatchError";
 
 const App = () => {
   return (
     <Routes>
-      <Route path="/*" element={<MainPage />}>
+      <Route path="/*" element={<CatchError><MainPage /></CatchError>}>
         <Route index element={<DashboardPage />} />
         <Route path="projects" element={<MyProjectsPage />} />
         <Route path="projects/:projectId" element={<ProjectPage />} />

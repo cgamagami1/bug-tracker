@@ -9,14 +9,17 @@ import { db } from "../utils/firebase-config";
 import { Invitation } from "../context/ProjectContext";
 import { ProjectContext } from "../context/ProjectContext";
 import { Link } from "react-router-dom";
+import SearchBox from "./SearchBox";
 
 type HeaderBarProps = {
   handleOnMenuClick: () => void;
   handleOnInboxClick: () => void;
   isInboxOpen: boolean;
+  handleOnSearchBoxClick: () => void;
+  isSearchBoxOpen: boolean;
 }
 
-const HeaderBar = ({ handleOnMenuClick, handleOnInboxClick, isInboxOpen }: HeaderBarProps) => {
+const HeaderBar = ({ handleOnMenuClick, handleOnInboxClick, isInboxOpen, handleOnSearchBoxClick, isSearchBoxOpen }: HeaderBarProps) => {
   const [myInvitations, setMyInvitations] = useState<Invitation[]>([]);
   const { user } = useContext(UserContext);
   const { addTeamMember } = useContext(ProjectContext);
@@ -66,6 +69,7 @@ const HeaderBar = ({ handleOnMenuClick, handleOnInboxClick, isInboxOpen }: Heade
         <h1 className="text-xl -translate-y-0.5 text-gray-800">my<span className="font-bold"><span className="text-purple-600">Bug</span>Tracker</span></h1>
       </div>
       <div className="flex gap-6">
+        <SearchBox isSearchBoxOpen={isSearchBoxOpen} handleOnSearchBoxClick={handleOnSearchBoxClick} />
         <div className="relative">
           <img className="hover:cursor-pointer" src={bell} alt="notification icon" onClick={handleOnInboxClick} />
           {myInvitations.length !== 0 && <span className="absolute -top-2 -right-1.5 bg-red-600 text-white rounded-full w-4 h-4 text-xs text-center border-2 border-white box-content">{ myInvitations.length }</span>}

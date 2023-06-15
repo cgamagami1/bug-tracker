@@ -5,6 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { ProjectContext, fetchTeamMembers } from "../context/ProjectContext";
 import { UserContext } from "../context/UserContext";
 import { TeamMember, ROLE } from "../context/ProjectContext";
+import { useErrorBoundary } from "react-error-boundary";
+import { FirebaseError } from "firebase/app";
 
 type FormFields = {
   title: string;
@@ -27,6 +29,7 @@ const TicketMenu = ({ editedItem }: TicketMenuProps) => {
   const [errorMessage, setErrorMessage] = useState("");
   const submitterProjects = projects.filter(project => hasRole(project.id, [ROLE.SUBMITTER, ROLE.PROJECT_ADMIN, ROLE.OWNER]));
   const navigate = useNavigate();
+  const { showBoundary } = useErrorBoundary();
   
   const [formFields, setFormFields] = useState<FormFields>({
     title: editedItem?.title ?? "",
@@ -66,6 +69,7 @@ const TicketMenu = ({ editedItem }: TicketMenuProps) => {
       }
       catch (error) {
         if (error instanceof Error) setErrorMessage("An error has occured: " + error.message);
+        if ((error as FirebaseError).code === "permission-denied") showBoundary(error);
       }
     }
 

@@ -4,7 +4,9 @@ import PriorityChart from "./PriorityChart";
 import StatusChart from "./StatusChart";
 import IncomingOutgoingChart from "./IncomingOutgoingChart";
 import ProjectChart from "./ProjectChart";
-import { useEffect } from "react";
+import { useContext } from "react";
+import { UserContext } from "../../context/UserContext";
+import DemoModeCard from "./DemoModeCard";
 
 export const chartOptions = {
   scales: {
@@ -25,10 +27,13 @@ export const chartOptions = {
 };
 
 const DashboardPage = () => {
+  const { userData } = useContext(UserContext);
 
   return (
     <div className="h-full w-full flex flex-col">
       <h2 className="text-xl mb-6"><Link to="/">Dashboard</Link></h2>
+
+      {userData.email === "demoowner@example.com" && <DemoModeCard />}
 
       <div className="grid-cols-1 grid md:grid-cols-2 md:grid-rows-2 gap-8 flex-grow">
         <Card title="Tickets By Priority">

@@ -43,8 +43,8 @@ const AuthMenu = ({ handleOnAuthMenuClose }: AuthMenuProps) => {
 
   return (
     <Modal handleOnSubmit={handleOnReauthentication}>
-      <label htmlFor="password" className="inline-block w-full text-center font-bold">Confirm Password</label>
-      <input type="password" id="password" value={password} onChange={handleOnChange} className="focus:outline-none w-full p-2 bg-gray-100 rounded-md" />
+      <label className="inline-block w-full text-center font-bold">Confirm Password</label>
+      <input type="password" value={password} onChange={handleOnChange} className="focus:outline-none w-full p-2 bg-gray-100 rounded-md" />
       <Button title="Submit" type="submit" isLoading={isLoading} />
       {errorMessage && <p>{ errorMessage }</p>}
     </Modal>

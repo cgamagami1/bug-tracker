@@ -1,7 +1,9 @@
-import { ChangeEvent, FormEvent, useContext, useState, Dispatch, SetStateAction } from "react";
+import { ChangeEvent, FormEvent, useContext, useState } from "react";
 import Modal from "../../components/Modal";
 import { TicketContext, Ticket, STATUS } from "../../context/TicketContext";
 import Button from "../../components/Button";
+import { useErrorBoundary } from "react-error-boundary";
+import { FirebaseError } from "firebase/app";
 
 type StatusMenuProps = {
   ticket: Ticket;
@@ -12,12 +14,18 @@ const StatusMenu = ({ ticket, handleOnCloseMenu }: StatusMenuProps) => {
   const { setTicketStatus } = useContext(TicketContext);
   const [status, setStatus] = useState(ticket.status);
   const [isLoading, setIsLoading] = useState(false);
+  const { showBoundary } = useErrorBoundary();  
 
   const handleOnSetStatus = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setIsLoading(true);
-    await setTicketStatus(ticket, status);
+    try {
+      await setTicketStatus(ticket, status);
+    }
+    catch (error) {
+      if ((error as FirebaseError).code === "permission-denied") showBoundary(error);
+    }
     setIsLoading(false);
     handleOnCloseMenu();
   }

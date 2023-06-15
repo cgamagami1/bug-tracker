@@ -4,6 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import Button, { BUTTON_STYLES } from "../../components/Button";
 import { UserContext } from "../../context/UserContext";
 import SignInAsGuest from "../../components/SignInAsGuest";
+import { getDownloadURL, ref } from "firebase/storage";
+import { storage } from "../../utils/firebase-config";
 
 const SignUpPage = () => {
   const [formFields, setFormFields] = useState({ firstName: "", lastName: "", email: "", password: "", confirmPassword: "" });
@@ -28,11 +30,12 @@ const SignUpPage = () => {
         firstName: formFields.firstName,
         lastName: formFields.lastName,
         email: formFields.email,
-        profilePicture: ""
+        profilePicture: await getDownloadURL(ref(storage, "profilePictures/pexels-pok-rie-130574.jpg")),
+        password: formFields.password
       };
 
       try {
-        await createUser(userData, formFields.password);
+        await createUser(userData);
 
         navigate("/");
       }

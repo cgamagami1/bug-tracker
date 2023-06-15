@@ -5,9 +5,7 @@ import TableRow from "../../components/TableRow";
 import TableData from "../../components/TableData";
 import AddTeamMemberCard from "./AddTeamMemberCard";
 import { useContext, useEffect, useState } from "react";
-import { ProjectContext, TeamMember, responseToTeamMembers, ROLE, fetchTeamMembers } from "../../context/ProjectContext";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "../../utils/firebase-config";
+import { ProjectContext, TeamMember, ROLE, fetchTeamMembers } from "../../context/ProjectContext";
 
 type TeamMemberTableProps = {
   projectId: string;

@@ -4,6 +4,7 @@ import { DateTime } from "luxon";
 import { UserContext } from "../context/UserContext";
 import { Project, ProjectContext, ROLE} from "../context/ProjectContext";
 import Button, { BUTTON_STYLES } from "./Button";
+import { useErrorBoundary } from "react-error-boundary";
 
 type FormFields = {
   title: string;
@@ -27,6 +28,7 @@ const ProjectMenu = ({ editedItem }: ProjectMenuProps) => {
   const { user } = useContext(UserContext);
   const { addProject, updateProject, deleteProject, hasRole } = useContext(ProjectContext);
   const navigate = useNavigate();
+  const { showBoundary } = useErrorBoundary();
 
   if (!user) return <></>;
 
@@ -41,13 +43,18 @@ const ProjectMenu = ({ editedItem }: ProjectMenuProps) => {
       endDate: formFields.endDate
     }
 
-    if (editedItem) {
-      await updateProject(editedItem.id, projectData);
-      navigate(`/projects/${editedItem.id}`);
+    try {
+      if (editedItem) {
+        await updateProject(editedItem.id, projectData);
+        navigate(`/projects/${editedItem.id}`);
+      }
+      else {
+        await addProject(projectData, user.uid);
+        navigate("/projects");
+      }
     }
-    else {
-      await addProject(projectData, user.uid);
-      navigate("/projects");
+    catch (error) {
+      showBoundary(error);
     }
 
     setIsLoading(false);

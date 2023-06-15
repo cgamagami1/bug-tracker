@@ -8,6 +8,8 @@ import { db } from "../../utils/firebase-config";
 import { UserContext } from "../../context/UserContext";
 import Button from "../../components/Button";
 import { timestampToDateTime } from "../../utils/date-conversion";
+import { useErrorBoundary } from "react-error-boundary";
+import { FirebaseError } from "firebase/app";
 
 export type Comment = {
   id: string;
@@ -27,6 +29,7 @@ const CommentsTable = ({ ticketId }: CommentTableProps) => {
   const { user } = useContext(UserContext);
   const [newComment, setNewComment] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { showBoundary } = useErrorBoundary();
 
   const { 
     sortedEntries,
@@ -61,11 +64,16 @@ const CommentsTable = ({ ticketId }: CommentTableProps) => {
     e.preventDefault();
     setIsLoading(true);
 
-    await addDoc(collection(db, "tickets", ticketId, "comments"), {
-      posterId: user?.uid,
-      message: newComment,
-      datePosted: serverTimestamp()
-    });
+    try {
+      await addDoc(collection(db, "tickets", ticketId, "comments"), {
+        posterId: user?.uid,
+        message: newComment,
+        datePosted: serverTimestamp()
+      });
+    }
+    catch (error) {
+      if ((error as FirebaseError).code === "permission-denied") showBoundary(error);
+    }
 
     setComments(await fetchComments());
     setNewComment("");

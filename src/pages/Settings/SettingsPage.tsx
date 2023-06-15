@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom"
 import Button from "../../components/Button";
 import { ChangeEvent, FormEvent, useContext, useState } from "react";
-import { UpdatedUserData, UserContext} from "../../context/UserContext";
+import { UserDataWithPassword, UserContext} from "../../context/UserContext";
 import { readFileURL } from "../../utils/read-file-url";
 import AuthMenu from "./AuthMenu";
 import { updatePassword } from "firebase/auth";
+import { getDownloadURL, uploadBytes, ref } from "firebase/storage";
+import { storage } from "../../utils/firebase-config";
 
 const SettingsPage = () => {
   const { user, userData, updateUserData } = useContext(UserContext);
@@ -12,8 +14,7 @@ const SettingsPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
 
-  const [formFields, setFormFields] = useState<UpdatedUserData & { confirmPassword: string }>({ ...userData, password: "", confirmPassword: "" });
-  const [pfpPreview, setPfpPreview] = useState(userData.profilePicture);
+  const [formFields, setFormFields] = useState<UserDataWithPassword & { confirmPassword: string }>({ ...userData, password: "", confirmPassword: "" });
 
   const handleOnAuthMenuClose = () => {
     setIsAuthMenuVisible(false);
@@ -25,11 +26,16 @@ const SettingsPage = () => {
     setIsLoading(true);
 
     try {
-      await updateUserData(formFields);
+      await updateUserData({
+        firstName: formFields.firstName,
+        lastName: formFields.lastName,
+        email: formFields.email,
+        profilePicture: formFields.profilePicture
+      });
       
       if (formFields.password !== "") {
         if (formFields.password === formFields.confirmPassword) {
-          updatePassword(user, formFields.password);
+          await updatePassword(user, formFields.password);
         }
         else {
           throw new Error ("Passwords do not match");
@@ -42,20 +48,29 @@ const SettingsPage = () => {
       console.log(error);
     }
 
+    setFormFields({ ...formFields, password: "", confirmPassword: "" })
     setIsLoading(false);
   }
 
-  const resetFormFields = () => setFormFields({ ...formFields, password: "", confirmPassword: "" });
 
   const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => { 
     setFormFields({ ...formFields, [e.target.id]: e.target.value });
     setStatusMessage(""); 
   };
 
+  const uploadPfp = async (pfp: File) => {
+    if (!user) throw new Error("Cannot upload profile picture: No user authenticated");
+    const picRef = ref(storage, `profilePictures/${user.uid}`);
+    await uploadBytes(picRef, pfp);
+    return await getDownloadURL(picRef);
+  }
+
   const handleOnProfilePictureChange = async (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFormFields({ ...formFields, profilePicture: e.target.files[0] });
-      setPfpPreview(await readFileURL(e.target.files[0]));
+      setFormFields({ 
+        ...formFields, 
+        profilePicture: await uploadPfp(e.target.files[0]) 
+      });
     }
 
     setStatusMessage("");
@@ -69,7 +84,7 @@ const SettingsPage = () => {
         <h3 className="text-xl p-2 border-b border-gray-400">My Settings</h3>
 
         <div className="flex-col flex px-2 py-4 w-72">
-          <img src={pfpPreview} alt="profile picture" className="w-32 h-32 object-cover rounded-[50%]" />
+          <img src={formFields.profilePicture} alt="profile picture" className="w-32 h-32 object-cover rounded-[50%]" />
           <label htmlFor="profilePicture" className="text-purple-600 underline ml-3 hover:cursor-pointer mb-4">Change Photo</label>
           <input type="file" accept=".png,.jpg" className="hidden" id="profilePicture" onChange={handleOnProfilePictureChange} />
 
